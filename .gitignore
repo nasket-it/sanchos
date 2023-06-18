@@ -62,4 +62,5 @@ docs/html
 *.mo
 
 # pynev
-.python-version
+.python-versiong
+.session
