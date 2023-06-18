@@ -45,10 +45,10 @@ all_signals = []
 
 
 #получаем все диалоги , функция корутина (запускается в самом низу листа )
-async def main():
-    dialogs = await client.get_dialogs()
-    dialogs = [f'{i.name} : {i.id}' for i in dialogs]
-    print(dialogs)
+# async def main():
+#     dialogs = await client.get_dialogs()
+#     dialogs = [f'{i.name} : {i.id}' for i in dialogs]
+#     print(dialogs)
 
 
 
@@ -221,6 +221,6 @@ if __name__ == '__main__':
     client.start()
     # Запуск бота aiogram
     executor.start_polling(dp)
-    client.loop.run_until_complete(main())
+    # client.loop.run_until_complete(main())
     # client.loop.run_until_complete(get_dialodgs())
 
