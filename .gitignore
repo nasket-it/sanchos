@@ -63,3 +63,4 @@ docs/html
 
 # pynev
 .python-versiong
+*.session
