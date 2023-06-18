@@ -1,4 +1,4 @@
-### Python template
+    ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -63,4 +63,3 @@ docs/html
 
 # pynev
 .python-versiong
-.session
