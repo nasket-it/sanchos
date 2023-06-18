@@ -3,17 +3,13 @@ from AlorPy import AlorPy  # Работа с Alor OpenAPI V2
 from Config import *
 # import openai
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
-# openai.api_key = "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"
+
 # import time
 from datetime import datetime
 
 
 
-#
-# async def global_chek(a):
-#     global check
-#     check = a
-#     return
+
 apProvider = AlorPy(Config.UserName, Config.RefreshToken)
 
 
@@ -80,15 +76,7 @@ def get_keyword_tiker_moex(text, keyword):
             ddd.append(Config.dict_keywod_tiker[i.upper()])#добавляем слово в спиок результатов
     return ddd[0] if len(ddd) >= 1 else '🤷‍♂'#
 
-    # text = [str(i).upper() for i in text.split()[0:7]]
-    # def func(str):
-    #     str1 = str
-    #     return str in Config.tickers_moex or str1[1:] in Config.tickers_moex or  str1[:-1] in Config.tickers_moex
-    # fitered = list(filter(func, text))
 
-
-
-#проверка id канала или чата поступаещего сообщения на наличие его в списке
 async def id_check(id, list):
     if id in list:
         return True
@@ -99,7 +87,7 @@ async def id_check(id, list):
 #фунекция отправзи запроса chatGPT
 def get_chatGPT(text):
 
-    response = openai.Completion.create(
+    response = Token.chatGPT_token.Completion.create(
         model="text-davinci-003",
         prompt=f"Стоставь этот текст другими словами  '{text}'",
         temperature=0.5,
@@ -325,28 +313,6 @@ def create_limit_order(symbol, buy, summ, step_best_price, portfolio='D78230', e
 
         apProvider.CreateLimitOrder(portfolio, exchange, symbol, buy, lot, float(price))
 
-    # rezult_ison = []
-    # all_potok_futures = []
-    # def fanc(tikers, str1=str):
-    #     try:
-    #         rezult_ison.append(get_tiker(tikers, str1))
-    #     except:
-    #         rezult_ison.append('0')
-    # for i in list_tikers: # проходим цыклом по словярю с тикерами фьючерсов
-    #     pt_1 = threading.Thread(target=fanc, args=(i,str)) #создаем поток функции гет запроса
-    #     all_potok_futures.append(pt_1) #добавляем все потоки запросов в список всех потокот , чтобы не ждать
-    #     pt_1.start()  #запускаем каждый поток
-    # for i in all_potok_futures:# запускаем цыкл по списку всех потоков программы
-    #     i.join() # ждем пока все потоки завершаться
-    # return rezult_ison
-
-
-
-
-
-
-
-
 
 async def forward_messages(source_channel, destination_channel, time_interval, delay):
     # Определение временных границ для получения истории сообщений
@@ -370,15 +336,3 @@ time_interval = 24 * 60 * 60  # 24 часа (в секундах)
 delay = 5  # Задержка в 5 секунд между отправкой каждого сообщения
 
 
-# loop = asyncio.get_event_loop()
-# loop.run_until_complete(forward_messages(source_channel, destination_channel, time_interval, delay))
-# print(get_symbol("MOEX")['lotsize'])
-
-# rez = get_symbol('SBER')
-# print(rez['lotsize'])
-# get_symbol('SBER')
-# create_limit_order('gazp')
-#
-# get_orderbook('SBER')
-
-# apProvider.CreateLimitOrder('D78230','MOEX', 'GAZP', 'buy', 1, 179.03)

@@ -8,7 +8,7 @@ from Config import Config  # Файл конфигурации
 from secrete import Token
 
 
-API_TOKEN = Token.bot_token#parser1_nasket_bot
+API_TOKEN = Token.bot_token
 
 
 # Создаем объекты бота и диспетчера
@@ -16,20 +16,15 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 
-#создаем клиента на Алор
-# apProvider = AlorPy(Config.UserName, Config.RefreshToken)
-
 exchange = 'MOEX'  # Код биржи MOEX или SPBX
 symbol = 'SBER'  # Тикер
-port_io = 'D78230'
-
-# # apProvider.CreateLimitOrder('D78230' ,'MOEX',symbol,'buy', 10, 232.84)
+port_io = Token.alor_portfolio
 
 
-#api ключи и токены
+
+
+
 account = ['-1001892817733','-1001857334624']
-# api_id = account[0]  # задаем API
-# api_hash = account[1]  # задаем HASH
 
 
 
