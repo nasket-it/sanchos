@@ -5,9 +5,10 @@ from aiogram import Bot, Dispatcher , types, executor
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from AlorPy import AlorPy  # Работа с Alor OpenAPI V2
 from Config import Config  # Файл конфигурации
+from secrete import Token
 
 
-API_TOKEN = '5255264666:AAHMtMDHdKwGV8J--ZVIU3smPLxPOQAuUgw'#parser1_nasket_bot
+API_TOKEN = Token.bot_token#parser1_nasket_bot
 
 
 # Создаем объекты бота и диспетчера
@@ -26,14 +27,14 @@ port_io = 'D78230'
 
 
 #api ключи и токены
-account = ['25694077', '3162902837761749b9310ca67058098c', '-1001892817733','-1001857334624']
-api_id = account[0]  # задаем API
-api_hash = account[1]  # задаем HASH
-phone = '+79265464264'
+account = ['-1001892817733','-1001857334624']
+# api_id = account[0]  # задаем API
+# api_hash = account[1]  # задаем HASH
 
 
 
-client = TelegramClient('my_account.session', api_id, api_hash)
+
+client = TelegramClient('my_account.session', Token.api_id,Token.api_hash)
 
 
 

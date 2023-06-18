@@ -1,5 +1,5 @@
 
-
+from secrete import Token
 
 
 # Чтобы получить Refresh Token:
@@ -19,8 +19,8 @@ class Config:
     # 1. Привязать торговый аккаунт
     # 2. Выписать токен
     UserName = 'P000000'
-    RefreshToken = '41dd83bd-bb83-4cf5-8df4-c6fb19485cd3'
-    PortfolioStocks = 'D78230'  # Фондовый рынок
+    RefreshToken = Token.alol_token
+    PortfolioStocks = Token.alor_portfolio  # Фондовый рынок
     AccountStocks = 'L01-00000F00'
     PortfolioFutures = '0000PST'  # Срочный рынок
     AccountFutures = '0000PST'

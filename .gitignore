@@ -64,3 +64,5 @@ docs/html
 # pynev
 .python-versiong
 *.session
+
+secrete.py
