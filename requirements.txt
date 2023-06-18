@@ -1,3 +1,5 @@
+# все установленные пакеты в проекте , чтоустановить все сразу ,
+#используйте команду pip install -r requirements.txt
 aiogram==2.25.1
 aiohttp==3.8.4
 aiosignal==1.3.1
