@@ -1,4 +1,4 @@
-
+import subprocess
 from telethon import *
 from all_functions import *
 from aiogram import Bot, Dispatcher , types, executor
@@ -6,6 +6,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQu
 from AlorPy import AlorPy  # Работа с Alor OpenAPI V2
 from Config import Config  # Файл конфигурации
 from secrete import Token
+
 
 
 API_TOKEN = Token.bot_token
@@ -48,9 +49,12 @@ all_signals = []
 
 
 
+
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
-    await bot.send_message(message.chat.id, 'Привет')
+    # await bot.send_message(message.chat.id, 'Привет')
+    subprocess.Popen(["python", "/path/to/your/script.py"])
+    await message.reply("Скрипт запущен.")
 
 
 

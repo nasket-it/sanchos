@@ -295,8 +295,12 @@ import concurrent.futures
 
 
 def get_price(symbol, x, step_best_price):
-    price = get_orderbook(symbol)
-    return price[x][step_best_price]["price"]
+    try:
+        price = get_orderbook(symbol)
+        print(price)
+        return price[x][step_best_price]["price"]
+    except:
+        print('Биржа закрыта')
 
 @decorator_speed
 def create_limit_order(symbol, buy, summ, step_best_price, portfolio='D78230', exchange='MOEX'):
