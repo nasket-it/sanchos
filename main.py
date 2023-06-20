@@ -1,12 +1,10 @@
-import subprocess
+from secrete import Token
 from telethon import *
 from all_functions import *
 from aiogram import Bot, Dispatcher , types, executor
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from AlorPy import AlorPy  # Работа с Alor OpenAPI V2
 from Config import Config  # Файл конфигурации
-from secrete import Token
-
 
 
 API_TOKEN = Token.bot_token
@@ -17,20 +15,23 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 
+#создаем клиента на Алор
+# apProvider = AlorPy(Config.UserName, Config.RefreshToken)
+
 exchange = 'MOEX'  # Код биржи MOEX или SPBX
 symbol = 'SBER'  # Тикер
-port_io = Token.alor_portfolio
+port_io = 'D78230'
 
 
-
-
-
+#api ключи и токены
 account = ['-1001892817733','-1001857334624']
+api_id = Token.api_id  # задаем API
+api_hash = Token.api_hash  # задаем HASH
+phone = Token.phone
 
 
 
-
-client = TelegramClient('my_account.session', Token.api_id,Token.api_hash)
+client = TelegramClient('my_account.session', api_id, api_hash)
 
 
 
@@ -42,21 +43,11 @@ all_signals = []
 
 
 #получаем все диалоги , функция корутина (запускается в самом низу листа )
-# async def main():
-#     dialogs = await client.get_dialogs()
-#     dialogs = [f'{i.name} : {i.id}' for i in dialogs]
-#     print(dialogs)
-
-
 
 
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
-    # await bot.send_message(message.chat.id, 'Привет')
-    subprocess.Popen(["python", "/path/to/your/script.py"])
-    await message.reply("Скрипт запущен.")
-
-
+    await bot.send_message(message.chat.id, 'Привет')
 
 
 #щбработчик нажатия инлайн кнопок
@@ -91,8 +82,6 @@ async def buttons_press(callback_query):
 
 
 
-
-# обработчик сообщений из каналов памперов , обрабатывает и автоматически покупает
 @client.on(events.NewMessage(chats=Config.pamper_channels_id))
 async def pamper_channels_handler(event):
     id_chennal = event.message.chat_id# достаем idчата или какнал от которо пришло сообщение
@@ -213,6 +202,32 @@ async def vip_channels_handler(event):
     await reader_create_button(text, event, message, id_chennal,f'📮 VIP-news', Config.news_vip_dict_reverse)
 
 
+
+
+async def get_dialodgs():
+    dialogs = await client.get_dialogs()
+    dialogs = [f'{i.name} : {i.id}' for i in dialogs ]
+    print(dialogs)
+
+
+#обработчик событий телеграмм , обрабатывает все вхлдящие сообщения
+@client.on(events.NewMessage())
+async def my_event_handler(event):
+    # dialogs = await client.get_dialogs()
+    # dialogs = [f'{i.name} : {i.id}' for i in dialogs ]
+    # print(dialogs)
+    # print(f'{event.raw_text}  : {len(event.raw_text)}')
+    #достаем idчата или какнал от которо пришло сообщение
+    id_chennal = event.message.chat_id
+    #достаем сообщение полное с медиа
+    message = event.message
+    #достаем только текст сообщени
+    text = event.message.message
+    # получаем название канала или чата
+    chat_name = event.chat.title
+    #получаем id сообщения
+    msg_id = event.id
+    # print(f'{chat_name} : {id_chennal}')
 
 
 
