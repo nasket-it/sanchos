@@ -210,24 +210,8 @@ async def get_dialodgs():
     print(dialogs)
 
 
-#обработчик событий телеграмм , обрабатывает все вхлдящие сообщения
-@client.on(events.NewMessage())
-async def my_event_handler(event):
-    # dialogs = await client.get_dialogs()
-    # dialogs = [f'{i.name} : {i.id}' for i in dialogs ]
-    # print(dialogs)
-    # print(f'{event.raw_text}  : {len(event.raw_text)}')
-    #достаем idчата или какнал от которо пришло сообщение
-    id_chennal = event.message.chat_id
-    #достаем сообщение полное с медиа
-    message = event.message
-    #достаем только текст сообщени
-    text = event.message.message
-    # получаем название канала или чата
-    chat_name = event.chat.title
-    #получаем id сообщения
-    msg_id = event.id
-    # print(f'{chat_name} : {id_chennal}')
+
+
 
 
 
