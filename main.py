@@ -82,7 +82,7 @@ async def buttons_press(callback_query):
 
 
 
-# @client.on(events.NewMessage(chats=Config.pamper_channels_id))
+@client.on(events.NewMessage(chats=Config.pamper_channels_id))
 async def pamper_channels_handler(event):
     id_chennal = event.message.chat_id# достаем idчата или какнал от которо пришло сообщение
     text = event.message.message # достаем только текст сообщени
