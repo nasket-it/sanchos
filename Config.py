@@ -38,11 +38,13 @@ class Config:
                        'Goodwin Production |GP Fund | 💎 | SS PRO Exclusive': -1001854844729,
                        'Чехов ВИП канал': -1001631261335,
                        'Клуб ProfitKing': -1001869402684,
+                       'Черных мастер Россия' : -1001574832908,
+                       'Биржевик | VipPirates': -1001926297746,
                        'NEWS' : -1001823451677,
                        }
 
 
-    pamper_channels_id = {-1001610556043, -1001612221317, -1001823451677, -1001970578176, -1001854844729, -1001631261335, -1001869402684 }
+    pamper_channels_id = {-1001926297746, -1001610556043, -1001612221317, -1001823451677, -1001970578176, -1001854844729, -1001631261335, -1001869402684,  -1001574832908 }
 
 
     pamper_channels_reverse = {-1001610556043 : 'РДВ Premium | SS PRO',
@@ -52,10 +54,12 @@ class Config:
                                -1001854844729 : 'Goodwin Production |GP Fund | 💎 | SS PRO Exclusive',
                                -1001631261335 : 'Чехов ВИП канал',
                                -1001869402684 : 'Клуб ProfitKing',
-                               -1001612221317 : 'K - trade' }
+                               -1001612221317 : 'K - trade' ,
+                               -1001574832908 : 'Черных мастер Россия',
+                               -1001926297746 : 'Биржевик | VipPirates'}
 
 
-    tickers_moex = ['ENPG', 'ETLN', 'FIXP', 'GLTR', 'SFTL', 'OKEY', 'OZON', 'PEP-RM', 'POLY', 'POSI', 'QIWI', 'TCSG', 'TSLA-RM', 'GEMC', 'VEON-RX', 'VKCO', 'WUSH', 'FIVE', 'YNDX', 'ABRD', 'AKRN', 'ALRS', 'APTK', 'AFKS', 'AMEZ', 'AFLT', 'VTBR', 'BSPB', 'BANE', 'BANEP', 'BLNG', 'BELU', 'VSMO', 'OGKB', 'GAZP', 'SIBN', 'GECO', 'SMLT', 'GRNT', 'LSRG', 'GCHE', 'GTRK', 'FESH', 'DSKY', 'DVEC', 'AQUA', 'IRAO', 'ISKJ', 'KLSB', 'KMAZ', 'IRKT', 'KROT', 'KAZT', 'KAZTP', 'LNZL', 'LNZLP', 'LENT', 'LSNG', 'LSNGP', 'LKOH', 'MVID', 'MGNT', 'MAGN', 'MDMG', 'MGTSP', 'MTLR', 'MTLRP', 'CBOM', 'MOEX', 'MSTT', 'MSNG', 'MSRS', 'MRKV', 'MRKS', 'MRKU', 'MRKY', 'MTSS', 'NSVZ', 'NKNC', 'NKNCP', 'NKHP', 'NLMK', 'NMTP', 'NVTK', 'GMKN', 'ORUP', 'UNAC', 'UWGN', 'KZOS', 'KZOSP', 'PMSB', 'PMSBP', 'PIKK', 'PLZL', 'RASP', 'RENI', 'RKKE', 'ROSN', 'MRKZ', 'MRKC', 'MRKP', 'RTKM', 'RTKMP', 'AGRO', 'RUAL', 'HYDR', 'RUGR', 'ROLO', 'RNFT', 'KRKNP', 'SBER', 'SBERP', 'CHMF', 'SGZH', 'SELG', 'FLOT', 'SVAV', 'SPBE', 'SNGS', 'SNGSP', 'TATN', 'TATNP', 'TTLK', 'TGKA', 'TGKN', 'TGKB', 'TGKBP', 'VRSB', 'TRNFP', 'TRMK', 'LIFE', 'PHOR', 'FEES', 'CNTL', 'CNTLP', 'CIAN', 'PRFN', 'CHMK', 'ELFV', 'SFIN', 'UPRO', 'UNKL', 'YAKG']
+    tickers_moex = ['CARM','ENPG', 'ETLN', 'FIXP', 'GLTR', 'SFTL', 'OKEY', 'OZON', 'PEP-RM', 'POLY', 'POSI', 'QIWI', 'TCSG', 'TSLA-RM', 'GEMC', 'VEON-RX', 'VKCO', 'WUSH', 'FIVE', 'YNDX', 'ABRD', 'AKRN', 'ALRS', 'APTK', 'AFKS', 'AMEZ', 'AFLT', 'VTBR', 'BSPB', 'BANE', 'BANEP', 'BLNG', 'BELU', 'VSMO', 'OGKB', 'GAZP', 'SIBN', 'GECO', 'SMLT', 'GRNT', 'LSRG', 'GCHE', 'GTRK', 'FESH', 'DSKY', 'DVEC', 'AQUA', 'IRAO', 'ISKJ', 'KLSB', 'KMAZ', 'IRKT', 'KROT', 'KAZT', 'KAZTP', 'LNZL', 'LNZLP', 'LENT', 'LSNG', 'LSNGP', 'LKOH', 'MVID', 'MGNT', 'MAGN', 'MDMG', 'MGTSP', 'MTLR', 'MTLRP', 'CBOM', 'MOEX', 'MSTT', 'MSNG', 'MSRS', 'MRKV', 'MRKS', 'MRKU', 'MRKY', 'MTSS', 'NSVZ', 'NKNC', 'NKNCP', 'NKHP', 'NLMK', 'NMTP', 'NVTK', 'GMKN', 'ORUP', 'UNAC', 'UWGN', 'KZOS', 'KZOSP', 'PMSB', 'PMSBP', 'PIKK', 'PLZL', 'RASP', 'RENI', 'RKKE', 'ROSN', 'MRKZ', 'MRKC', 'MRKP', 'RTKM', 'RTKMP', 'AGRO', 'RUAL', 'HYDR', 'RUGR', 'ROLO', 'RNFT', 'KRKNP', 'SBER', 'SBERP', 'CHMF', 'SGZH', 'SELG', 'FLOT', 'SVAV', 'SPBE', 'SNGS', 'SNGSP', 'TATN', 'TATNP', 'TTLK', 'TGKA', 'TGKN', 'TGKB', 'TGKBP', 'VRSB', 'TRNFP', 'TRMK', 'LIFE', 'PHOR', 'FEES', 'CNTL', 'CNTLP', 'CIAN', 'PRFN', 'CHMK', 'ELFV', 'SFIN', 'UPRO', 'UNKL', 'YAKG']
     # список vip каналов где ключи свои названия + id + name , все в одном словаре
     channel_vip = {'DayCapitalPRO': {'id': -1001942594464, 'name': 'Day Capital PRO'},
                    'DayCapitalАнтикризис': {'id': -1001854448824, ' name': '30. Day Capital антикризис | VipPirates'},
@@ -77,7 +81,7 @@ class Config:
 
     # словарь ,где название ключ и id канала значение , каналов с сигналами
     channel_vip_dict = {'Day Capital PRO': -1001942594464,
-                        '19. DayCapitalPro | VipPirates' : -1001589744148,
+                        # '19. DayCapitalPro | VipPirates' : -1001589744148,
                         '30. Day Capital антикризис | VipPirates': -1001854448824,
                         #'Олег торгует': -1001772781939,
                         'Чехов ВИП канал': -1001631261335,
@@ -98,7 +102,7 @@ class Config:
 
     # обратный словарь channel_vip_dict, поменяны ключи и значения
     channel_vip_dict_reverse = { -1001942594464: 'Day Capital PRO',
-                                -1001589744148 :  '19. DayCapitalPro | VipPirates' ,
+                                # -1001589744148 :  '19. DayCapitalPro | VipPirates' ,
                                 -1001854448824: '30. Day Capital антикризис | VipPirates',
                                 -1001970578176 : 'Олег торгует' ,
                                 -1001631261335: 'Чехов ВИП канал',
@@ -116,7 +120,10 @@ class Config:
                                   -1001794244952 :  '31. Antrading Official +| VipPirates',
                                  -1001869402684 : 'Клуб ProfitKing'}
     # список vip id каналов с сигналами
-    channel_vip_id = [ -1001942594464, -1001589744148, -1001854448824, -1001970578176,
+    channel_vip_id = [ -1001942594464,
+                       # -1001589744148,
+                       -1001854448824,
+                       -1001970578176,
                        -1001631261335,
                       -1001610556043,
                        -1001977191743,

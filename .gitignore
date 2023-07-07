@@ -66,3 +66,5 @@ docs/html
 *.session
 
 secrete.py
+
+test.py

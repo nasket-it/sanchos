@@ -1,10 +1,13 @@
 from main import bot, client
 from AlorPy import AlorPy  # Работа с Alor OpenAPI V2
 from Config import *
+from keywords import Keywords
 import openai
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 import time
+import re
 from datetime import datetime
+import requests
 
 
 
@@ -25,6 +28,16 @@ def decorator_speed(func):
         return rez
     return wrapper
 
+#разбивает текст на строки с сайт а disclouser , возращает в формате для сообщения в телеграмм
+def disclouser(text):
+    rez = re.split(r'\d+\. ', text)
+    rezult = rez[0]
+    for i in rez:
+        if ':' in i:
+            j = ' '.join(i.split()[:2])
+            f = f'📌{j} : {i.split(":")[-1]}\n'
+            rezult += f
+    return rezult
 
 
 
@@ -112,8 +125,9 @@ def get_chatGPT(text):
 
 #получаем информацию по позициям
 def get_pozicion():
+    # print(apProvider.GetPositions(Config.PortfolioStocks, Config.exchange))
     rezult = apProvider.GetPositions(Config.PortfolioStocks, Config.exchange)[0]
-    rezult = list(rezult.items())[:3]
+    rezult = list(rezult.items())
     str = ''
     for key, value in dict(rezult).items():
         str += f'{key} - {value}\n'
@@ -211,6 +225,14 @@ def keyword_search(text, keywords):
     else:
         return False
 
+#нахождение любого ключевого слова из списка
+def search_any_keyword(text, keywords ):
+    text = [str(i).upper() for i in text.split()]
+    keywords = [str(i).upper() for i in keywords]
+    for i in keywords:
+        if i in text:
+            return True
+    return  False
 
 
 
@@ -318,30 +340,21 @@ def create_limit_order(symbol, buy, summ, step_best_price, portfolio='D78230', e
     with concurrent.futures.ThreadPoolExecutor() as executor:
         price_future = executor.submit(get_price, symbol, x, step_best_price)
         price = price_future.result()
-
         lot = int(int(summ) // (lot * price))
         # price = calculate_new_price(info['minstep'], 0.4, price, x == 'asks')
-
         apProvider.CreateLimitOrder(portfolio, exchange, symbol, buy, lot, float(price))
-
-    # rezult_ison = []
-    # all_potok_futures = []
-    # def fanc(tikers, str1=str):
-    #     try:
-    #         rezult_ison.append(get_tiker(tikers, str1))
-    #     except:
-    #         rezult_ison.append('0')
-    # for i in list_tikers: # проходим цыклом по словярю с тикерами фьючерсов
-    #     pt_1 = threading.Thread(target=fanc, args=(i,str)) #создаем поток функции гет запроса
-    #     all_potok_futures.append(pt_1) #добавляем все потоки запросов в список всех потокот , чтобы не ждать
-    #     pt_1.start()  #запускаем каждый поток
-    # for i in all_potok_futures:# запускаем цыкл по списку всех потоков программы
-    #     i.join() # ждем пока все потоки завершаться
-    # return rezult_ison
+        print(f'Цена покупки {float(price)}')
+        print(lot)
 
 
 
-
+def get_request(url):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+    response = requests.get(url, headers)
+    return response
 
 
 
@@ -369,15 +382,5 @@ time_interval = 24 * 60 * 60  # 24 часа (в секундах)
 delay = 5  # Задержка в 5 секунд между отправкой каждого сообщения
 
 
-# loop = asyncio.get_event_loop()
-# loop.run_until_complete(forward_messages(source_channel, destination_channel, time_interval, delay))
-# print(get_symbol("MOEX")['lotsize'])
-
-# rez = get_symbol('SBER')
-# print(rez['lotsize'])
-# get_symbol('SBER')
-# create_limit_order('gazp')
-#
-# get_orderbook('SBER')
-
-# apProvider.CreateLimitOrder('D78230','MOEX', 'GAZP', 'buy', 1, 179.03)
+risk = apProvider.GetRisk(Config.PortfolioStocks, 'MOEX')
+print(risk)

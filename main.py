@@ -4,7 +4,9 @@ from all_functions import *
 from aiogram import Bot, Dispatcher , types, executor
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from AlorPy import AlorPy  # Работа с Alor OpenAPI V2
+from keywords import Keywords
 from Config import Config  # Файл конфигурации
+from bs4 import BeautifulSoup
 
 
 API_TOKEN = Token.bot_token
@@ -40,6 +42,10 @@ client = TelegramClient('my_account.session', api_id, api_hash)
 check1 = 0
 all_signals = []
 
+async def get_dialodgs():
+    dialogs = await client.get_dialogs()
+    dialogs = [f'{i.name} : {i.id}' for i in dialogs ]
+    print(dialogs)
 
 
 #получаем все диалоги , функция корутина (запускается в самом низу листа )
@@ -47,7 +53,24 @@ all_signals = []
 
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
-    await bot.send_message(message.chat.id, 'Привет')
+    await bot.send_message(message.chat.id, 'Привет')\
+
+@dp.message_handler()
+async def process_start_command(message: types.Message):
+    print(message)
+    url = message["entities"][0]["url"]
+    print(url)
+    response = get_request(url)
+    soup = BeautifulSoup(response.text , 'html.parser')
+    div_tag = soup.find('div', {'style': 'word-break: break-word; word-wrap: break-word; white-space: pre-wrap;'})
+    if div_tag:
+        extracted_text = div_tag.get_text(strip=True)
+        text = disclouser(extracted_text)
+        print(extracted_text)
+        print(text)
+    # await bot.send_message(message.chat.id, 'Привет')
+
+
 
 
 #щбработчик нажатия инлайн кнопок
@@ -96,7 +119,7 @@ async def pamper_channels_handler(event):
             if keyword_search(text, keyword_RDV):# если в тексте сообщения есть ВСЕ!!! слова ключевые
                 buy = 'buy'# покупаем или продаем , настраивается вручную
                 summ = '100000'# сумма покупки , насраивается вручную
-                create_limit_order(tiker, buy, summ, 0)# функция покупки
+                create_limit_order(tiker, buy, summ, 1)# функция покупки
         # если сообщение от канала K-Trade | SS Exclusive'
         if id_chennal == Config.pamper_channels['K - trade']:
             keyword_KTrade = ['ЛОНГ', 'ВХОД:']
@@ -105,9 +128,9 @@ async def pamper_channels_handler(event):
             keyword_KTrade3 = ['МОЖНО', 'ВЗЯТЬ']
             if keyword_search(text, keyword_KTrade) or keyword_search(text,keyword_KTrade1) or keyword_search(text,keyword_KTrade2) or keyword_search(text,keyword_KTrade3) :
                 buy = 'buy'
-                summ = '150000'
+                summ = '250000'
                 print('long')
-                create_limit_order(tiker, buy, summ, 0)
+                create_limit_order(tiker, buy, summ, 1)
         # если сообщение от канала Олег торгует
         if id_chennal == Config.pamper_channels['Олег торгует']:
             keyword_Oleg1 = ['#ИДЕЯ', 'ЛОНГ','ВХОД']
@@ -116,16 +139,16 @@ async def pamper_channels_handler(event):
                 buy = 'buy'
                 summ = '70000'
                 print('long')
-                create_limit_order(tiker, buy, summ, 0)
+                create_limit_order(tiker, buy, summ, 1)
         # если сообщение от канала Goodwin Production |GP Fund | 💎 | SS PRO Exclusive
         if id_chennal == Config.pamper_channels['Goodwin Production |GP Fund | 💎 | SS PRO Exclusive']:
             keyword_Goodwin1 = ['ПОКУПКА', 'СТОП','ПРОФИТЫ']
             keyword_Goodwin2 = ['ПОКУПКА', 'СТОП','ПРОФИТ']
-            if keyword_search(text, keyword_Goodwin1) or keyword_search(text,keyword_Goodwin2):
+            if keyword_search(text, keyword_Goodwin1) or keyword_search(text,keyword_Goodwin2) or search_any_keyword(text, Keywords.goodwin):
                 buy = 'buy'
-                summ = '150000'
+                summ = '250000'
                 print('long')
-                create_limit_order(tiker, buy, summ, 0)
+                create_limit_order(tiker, buy, summ, 1)
 
         if id_chennal == Config.pamper_channels['Чехов ВИП канал']:
             keyword1 = ['ПРИКУПИТЕ', 'НЕМНОГО']
@@ -134,20 +157,41 @@ async def pamper_channels_handler(event):
             keyword4 = ['ПОКУПАЮ', 'НЕМНОГО']
             if keyword_search(text, keyword1) or keyword_search(text,keyword2) or keyword_search(text,keyword3) or keyword_search(text,keyword4):
                 buy = 'buy'
-                summ = '200000'
+                summ = '250000'
                 print('long')
-                create_limit_order(tiker, buy, summ, 0)
+                create_limit_order(tiker, buy, summ, 1)
 
         if id_chennal == Config.pamper_channels['Клуб ProfitKing']:
                     keyword1 = ['КУПИЛ']
                     keyword2 = ['ПОКУПКА']
                     keyword3 = ['ВЗЯЛ']
                     keyword4 = ['ПОКУПАЮ']
-                    if len(str(text).split()) <= 8 and  keyword_search(text,keyword2) or keyword_search(text,keyword3) or keyword_search(text,keyword4) or keyword_search(text,keyword1):
+                    keyword5 = ['ПЕРЕЗАХОЖУ']
+                    if len(str(text).split()) <= 12 and  keyword_search(text,keyword5) or keyword_search(text,keyword2) or keyword_search(text,keyword3) or keyword_search(text,keyword4) or keyword_search(text,keyword1):
                         buy = 'buy'
-                        summ = '200000'
+                        summ = '250000'
                         print('long')
-                        create_limit_order(tiker, buy, summ, 0)
+                        create_limit_order(tiker, buy, summ, 1)
+
+
+        if id_chennal == Config.pamper_channels['Биржевик | VipPirates']:
+                    keyword1 = ['ЛОНГ']
+                    keyword4 = ['⚡️Беру','беру', '⚡️Забираю']
+                    if search_any_keyword(text, keyword4) and keyword_search(text, keyword1):
+                        buy = 'buy'
+                        summ = '250000'
+                        print('long')
+                        create_limit_order(tiker, buy, summ, 1)
+
+
+        if id_chennal == Config.pamper_channels['Черных мастер Россия']:
+                    keyword1 = ['']
+                    keyword4 = ['Покупаю','Куплю']
+                    if search_any_keyword(text, keyword4) :
+                        buy = 'buy'
+                        summ = '250000'
+                        print('long')
+                        create_limit_order(tiker, buy, summ, 1)
 
 
 
@@ -156,6 +200,8 @@ async def pamper_channels_handler(event):
 #обработчик сообщений только из канала id из списка channel_pyblic_id
 @client.on(events.NewMessage(chats=Config.channel_pyblic_id))
 async def vip_channels_handler(event):
+    # dialogs = await get_dialodgs()
+    # print(dialogs)
     # достаем idчата или какнал от которо пришло сообщение
     id_chennal = event.message.chat_id
     # print(id_chennal)
@@ -204,13 +250,13 @@ async def vip_channels_handler(event):
 
 
 
-async def get_dialodgs():
-    dialogs = await client.get_dialogs()
-    dialogs = [f'{i.name} : {i.id}' for i in dialogs ]
-    print(dialogs)
 
 
 
+# @client.on(events.NewMessage())
+# async def new(event):
+#     dialogs = await get_dialodgs()
+#     print(dialogs)
 
 
 
