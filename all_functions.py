@@ -1,7 +1,8 @@
+from numba import njit
 from main import bot, client
 from AlorPy import AlorPy  # Работа с Alor OpenAPI V2
 from Config import *
-from keywords import Keywords
+from keywords import Keywords, Risck
 import openai
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 import time
@@ -19,14 +20,35 @@ import requests
 apProvider = AlorPy(Config.UserName, Config.RefreshToken)
 
 
+
+
+def risk(symbol):
+    # if symbol.upper() in Risck.K380:
+    #     return '380000'
+    if symbol.upper() in Risck.k400:
+        return '400000'
+    if symbol.upper() in Risck.k500:
+        return '500000'
+    if symbol.upper() in Risck.K470:
+        return '470000'
+    if symbol.upper() in Risck.k600:
+        return '600000'
+    if symbol.upper() in Risck.K650:
+        return '650000'
+    if symbol.upper() in Risck.K800:
+        return '800000'
+    return '300000'
+
+
 def decorator_speed(func):
     def wrapper(*args, **kwargs):
         start = datetime.now()
         rez = func(*args, **kwargs)
         t = datetime.now() - start
-        print(f'Скоромть выполнения - 🚀 {t}')
+        print(f'Скоромть выполнения  - 🚀 {t}')
         return rez
     return wrapper
+
 
 #разбивает текст на строки с сайт а disclouser , возращает в формате для сообщения в телеграмм
 def disclouser(text):
@@ -38,8 +60,6 @@ def disclouser(text):
             f = f'📌{j} : {i.split(":")[-1]}\n'
             rezult += f
     return rezult
-
-
 
 
 #проверка поступаещего сообщения на ключевые слова в нем и
@@ -99,7 +119,6 @@ def get_keyword_tiker_moex(text, keyword):
     # fitered = list(filter(func, text))
 
 
-
 #проверка id канала или чата поступаещего сообщения на наличие его в списке
 async def id_check(id, list):
     if id in list:
@@ -139,7 +158,7 @@ def get_orders():
     rezult = apProvider.GetOrders(Config.PortfolioStocks, Config.exchange)
     return rezult
 
-
+#получаем стакан
 def get_orderbook(symbol):
     rezult = apProvider.GetOrderBook(Config.exchange,symbol,'MOEX')
     return rezult
@@ -160,6 +179,7 @@ def get_portfolio():
         c += 1
     return str
 
+
 # #создать  лимитную заявку
 # def create_limit_order(symbol, buy, summ,step_best_price ,portfolio='D78230',exchange='MOEX'):
 #     x = "asks" if buy == 'buy' else "bids"
@@ -179,7 +199,7 @@ def calculate_new_price(step, percent, price, is_increase=True):
         new_price = price + (price * percent / 100)
     else:
         new_price = price - (price * percent / 100)
-    if step == 1 :
+    if step >= 1 :
         return round(new_price / step) * step
     else:
         new_price = round(new_price / step) * step
@@ -218,22 +238,28 @@ def create_automatic_order(text):
 
 # нахождение всех ключевых слов из списка в тексте
 def keyword_search(text, keywords):
-    text = [str(i).upper() for i in text.split()]
+    text = text.upper()
     # print(text)
     if all(keyword in text for keyword in keywords):
         return True
     else:
         return False
 
-#нахождение любого ключевого слова из списка
-def search_any_keyword(text, keywords ):
-    text = [str(i).upper() for i in text.split()]
-    keywords = [str(i).upper() for i in keywords]
-    for i in keywords:
-        if i in text:
-            return True
-    return  False
 
+#нахождение любого ключевого слова или словочетания  из списка
+@decorator_speed
+def search_any_keyword(text, keywords ):
+    for i in keywords:
+        if i.lower() in text.lower():
+            return True
+    return False
+
+
+#находит корни ключеывх слов через re выражения
+def search_re(text, keywords , number):
+    rez = [i for i in keywords  if re.search(i.lower() , text.lower())]
+    print(f'{len(rez)} {rez}')
+    return True if len(rez) >= number else False
 
 
 #информация лб инструменте
@@ -265,16 +291,18 @@ async def reader_create_button(text, event , message, id_chennal, smiley,chanell
             if value:
                 # tiker = str(get_keyword_tiker_moex(text, Config.tickers_moex))
                 #создаем клавиатуру
-                markup = InlineKeyboardMarkup(row_width=3)
+                markup = InlineKeyboardMarkup(row_width=4)
                 # создаем кнопку внизу сообщения с названием "Опубликовать" и id - 'but_1'
-                but_1 = InlineKeyboardButton(f'🟢{tiker} 40k', callback_data=f'0 40000 buy {tiker}')
-                but_2 = InlineKeyboardButton(f'🟢{tiker} 80k', callback_data=f'0 80000 buy {tiker}')
-                but_3 = InlineKeyboardButton(f'🔴 +0,4% 40k', callback_data=f'1 40000 sell {tiker}')
-                but_4 = InlineKeyboardButton(f'🔴{tiker} 40k', callback_data=f'0 40000 sell {tiker}')
-                but_5 = InlineKeyboardButton(f'🔴{tiker} 80k', callback_data=f'0 80000 sell {tiker}')
-                but_6 = InlineKeyboardButton(f'🟢 -0,4% 40k', callback_data=f'1 40000 buy {tiker}')
+                but_1 = InlineKeyboardButton(f'🟢{tiker}', callback_data=f'2 0 0 {tiker}')
+                but_2 = InlineKeyboardButton(f'200', callback_data=f'0 200000 buy {tiker}')
+                but_3 = InlineKeyboardButton(f'80k', callback_data=f'0 80000 buy {tiker}')
+                but_4 = InlineKeyboardButton(f'40k', callback_data=f'0 40000 buy {tiker}')
+                but_5 = InlineKeyboardButton(f'🔴{tiker}', callback_data=f'2 0 0 {tiker}')
+                but_6 = InlineKeyboardButton(f'200', callback_data=f'0 200000 sell {tiker}')
+                but_7 = InlineKeyboardButton(f'80k', callback_data=f'0 80000 sell {tiker}')
+                but_8 = InlineKeyboardButton(f'40k', callback_data=f'0 40000 sell {tiker}')
                 # добавляем кнопку в клавиатуру
-                markup.add(but_1, but_2, but_3, but_4, but_5, but_6)
+                markup.add(but_1, but_2, but_3, but_4, but_5, but_6, but_7, but_8)
                 # редактируем текст сообщениия , добавляем имя канала в переменной chat_name {Config.channel_vip_dict_reverse[id_chennal]
                 event.message.text = f'{smiley}\n\n{chanell_dict_reverse[id_chennal]}' + f"\n\n{event.message.text}"
                 # print('long')
@@ -289,16 +317,18 @@ async def reader_create_button(text, event , message, id_chennal, smiley,chanell
             if value:
                 # tiker= str(get_keyword_tiker_moex(text, Config.tickers_moex))
                 # создаем клавиатуру
-                markup = InlineKeyboardMarkup(row_width=3)
+                markup = InlineKeyboardMarkup(row_width=4)
                 # создаем кнопку внизу сообщения с названием "Опубликовать" и id - 'but_1'
-                but_1 = InlineKeyboardButton(f'🔴{tiker} 40k', callback_data=f'0 40000 sell {tiker}')
-                but_2 = InlineKeyboardButton(f'🔴{tiker} 80k', callback_data=f'0 80000 sell {tiker}')
-                but_3 = InlineKeyboardButton(f'🟢 -0,4% 40k', callback_data=f'1 40000 buy {tiker}')
-                but_4 = InlineKeyboardButton(f'🟢{tiker} 40k', callback_data=f'0 40000 buy {tiker}')
-                but_5 = InlineKeyboardButton(f'🟢{tiker} 80k', callback_data=f'0 80000 buy {tiker}')
-                but_6 = InlineKeyboardButton(f'🔴 +0,4% 40k', callback_data=f'1 40000 sell {tiker}')
+                but_1 = InlineKeyboardButton(f'🔴{tiker}', callback_data=f'2 0 0 {tiker}')
+                but_2 = InlineKeyboardButton(f'200', callback_data=f'0 200000 sell {tiker}')
+                but_3 = InlineKeyboardButton(f'80k', callback_data=f'0 80000 sell {tiker}')
+                but_4 = InlineKeyboardButton(f'40k', callback_data=f'0 40000 sell {tiker}')
+                but_5 = InlineKeyboardButton(f'🟢{tiker}', callback_data=f'2 0 0 {tiker}')
+                but_6 = InlineKeyboardButton(f'200', callback_data=f'0 200000 buy {tiker}')
+                but_7 = InlineKeyboardButton(f'80k', callback_data=f'0 80000 buy {tiker}')
+                but_8 = InlineKeyboardButton(f'40k', callback_data=f'0 40000 buy {tiker}')
                 # добавляем кнопку в клавиатуру
-                markup.add(but_1, but_2, but_3, but_4, but_5, but_6)
+                markup.add(but_1, but_2, but_3, but_4, but_5, but_6, but_7, but_8)
                 print('short')
                 # редактируем текст сообщениия , добавляем имя канала в переменной chat_name {Config.channel_vip_dict_reverse[id_chennal]
                 event.message.text = f'{smiley}\n\n{chanell_dict_reverse[id_chennal]}' + f"\n\n{event.message.text}"
@@ -307,16 +337,18 @@ async def reader_create_button(text, event , message, id_chennal, smiley,chanell
         else:
             # tiker = str(get_keyword_tiker_moex(text, Config.tickers_moex))
             # создаем клавиатуру
-            markup = InlineKeyboardMarkup(row_width=3)
+            markup = InlineKeyboardMarkup(row_width=4)
             # создаем кнопку внизу сообщения с названием "Опубликовать" и id - 'but_1'
-            but_1 = InlineKeyboardButton(f'🟢{tiker} 40k', callback_data=f'0 40000 buy {tiker}')
-            but_2 = InlineKeyboardButton(f'🟢{tiker} 80k', callback_data=f'0 80000 buy {tiker}')
-            but_3 = InlineKeyboardButton(f'🔴 +0,4% 40k', callback_data=f'1 40000 sell {tiker}')
-            but_4 = InlineKeyboardButton(f'🔴{tiker} 40k', callback_data=f'0 40000 sell {tiker}')
-            but_5 = InlineKeyboardButton(f'🔴{tiker} 80k', callback_data=f'0 80000 sell {tiker}')
-            but_6 = InlineKeyboardButton(f'🟢 -0,4% 40k', callback_data=f'1 400000 buy {tiker}')
+            but_1 = InlineKeyboardButton(f'🟢{tiker}', callback_data=f'2 0 0 {tiker}')
+            but_2 = InlineKeyboardButton(f'200', callback_data=f'0 200000 buy {tiker}')
+            but_3 = InlineKeyboardButton(f'80k', callback_data=f'0 80000 buy {tiker}')
+            but_4 = InlineKeyboardButton(f'40k', callback_data=f'0 40000 buy {tiker}')
+            but_5 = InlineKeyboardButton(f'🔴{tiker}', callback_data=f'2 0 0 {tiker}')
+            but_6 = InlineKeyboardButton(f'200', callback_data=f'0 200000 sell {tiker}')
+            but_7 = InlineKeyboardButton(f'80k', callback_data=f'0 80000 sell {tiker}')
+            but_8 = InlineKeyboardButton(f'40k', callback_data=f'0 40000 sell {tiker}')
             # добавляем кнопку в клавиатуру
-            markup.add(but_1, but_2, but_3, but_4, but_5, but_6)
+            markup.add(but_1, but_2, but_3, but_4, but_5, but_6, but_7, but_8)
             # редактируем текст сообщениия , добавляем имя канала в переменной chat_name {Config.channel_vip_dict_reverse[id_chennal]
             event.message.text = f'{smiley}\n\n{chanell_dict_reverse[id_chennal]}' + f"\n\n{event.message.text}"
             # print('long')
@@ -347,7 +379,6 @@ def create_limit_order(symbol, buy, summ, step_best_price, portfolio='D78230', e
         print(lot)
 
 
-
 def get_request(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
@@ -355,9 +386,6 @@ def get_request(url):
     }
     response = requests.get(url, headers)
     return response
-
-
-
 
 
 async def forward_messages(source_channel, destination_channel, time_interval, delay):
@@ -375,12 +403,108 @@ async def forward_messages(source_channel, destination_channel, time_interval, d
         # Пересылка сообщения в другой канал
         # await client.forward_messages(destination_channel, message)
 
-# Использование функции
-source_channel = 'source_channel_id'
-destination_channel = 'destination_channel_id'
-time_interval = 24 * 60 * 60  # 24 часа (в секундах)
-delay = 5  # Задержка в 5 секунд между отправкой каждого сообщения
+#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Олег торгуе
+def oleg_reading(text, tiker):
+    keyword_Oleg1 = ['#ИДЕЯ', 'ЛОНГ', 'ВХОД']
+    keyword_Oleg2 = ['ИДЕЯ', 'ЛОНГ', 'ВХОД']
+    if keyword_search(text, keyword_Oleg1) or keyword_search(text, keyword_Oleg2):
+        buy = 'buy'
+        summ = risk(tiker)
+        print('long - 👉 🎈Олег торгует')
+        create_limit_order(tiker, buy, summ, 1)
 
 
-risk = apProvider.GetRisk(Config.PortfolioStocks, 'MOEX')
-print(risk)
+#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала K-traide
+def k_trade_reading(text, tiker):
+    keyword_KTrade = ['ЛОНГ', 'ВХОД:']
+    keyword_KTrade1 = ['ЗАХОДИМ', 'СПЕКУЛЯТИВНО']
+    keyword_KTrade2 = ['МОЖНО', 'ЗАЙТИ']
+    keyword_KTrade3 = ['МОЖНО', 'ВЗЯТЬ']
+    if keyword_search(text, keyword_KTrade) or keyword_search(text, keyword_KTrade1) or keyword_search(text,keyword_KTrade2) or keyword_search(text, keyword_KTrade3):
+        buy = 'buy'
+        summ = risk(tiker)
+        print('long - 👉 🎈K - trade ')
+        create_limit_order(tiker, buy, summ, 1)
+
+
+#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала RDV - премиум
+def RDV_reading(text,tiker):
+    keyword_RDV = ['OТКPЫТИE', 'LONG', 'CPOК', 'ИДEИ:',
+                   'ДO']  # ключевые слова на покупку сигнала из сообщений этого канала
+    if keyword_search(text, keyword_RDV):  # если в тексте сообщения есть ВСЕ!!! слова ключевые
+        buy = 'buy'  # покупаем или продаем , настраивается вручную
+        summ = '100000'  # сумма покупки , насраивается вручную
+        print('long - 👉 🎈РДВ Premium')
+        create_limit_order(tiker, buy, summ, 1)  # функция покупки
+
+
+#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Goodwin
+def goodwin_reading(text,tiker):
+    if re.search('#скальпин',text, 1):
+        if search_re(text,Keywords.goodwin_short, 1):
+            print('🤬')
+        else:
+            keyword_Goodwin1 = ['ПОКУПКА', 'СТОП']
+            if keyword_search(text, keyword_Goodwin1) or search_re(text,Keywords.goodwin2, 2):
+                buy = 'buy'
+                summ = risk(tiker)
+                print('long - 👉 🎈Goodwin Production')
+                create_limit_order(tiker, buy, summ, 1)
+
+
+#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Чехов вип
+def chehov_reading(text, tiker):
+        keyword1 = ['ПРИКУПИТЕ', 'НЕМНОГО']
+        keyword2 = ['ПРИКУПИМ', 'НЕМНОГО']
+        keyword3 = ['ПОКУПАЕМ', 'НЕМНОГО']
+        keyword4 = ['ПОКУПАЮ', 'НЕМНОГО']
+        if keyword_search(text, keyword1) or keyword_search(text, keyword2) or keyword_search(text,keyword3) or keyword_search(text, keyword4):
+            buy = 'buy'
+            summ = risk(tiker)
+            print('long - 👉 🎈Чехов ВИП канал')
+            create_limit_order(tiker, buy, summ, 1)
+
+
+#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала ProfitKing
+def ProfitKing_reading(text,tiker):
+    keyword1 = ['КУПИЛ']
+    keyword2 = ['ПОКУПКА']
+    keyword3 = ['ВЗЯЛ']
+    keyword4 = ['ПОКУПАЮ']
+    keyword5 = ['ПЕРЕЗАХОЖУ']
+    if len(str(text).split()) <= 12 and keyword_search(text, keyword5) or keyword_search(text,keyword2) or keyword_search(text, keyword3) or keyword_search(text, keyword4) or keyword_search(text, keyword1):
+        buy = 'buy'
+        summ = risk(tiker)
+        print('long - 👉 🎈Клуб ProfitKing')
+        create_limit_order(tiker, buy, summ, 1)
+
+
+#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Биржевик
+def birgewik_reading(text,tiker):
+    keyword1 = ['цель', 'средняя', 'лонг']
+    keyword4 = ['⚡️Беру', 'беру', '⚡️Забираю']
+    if search_any_keyword(text,Keywords.birgewik) and search_any_keyword(text,keyword1):
+        buy = 'buy'
+        summ = risk(tiker)
+        print('long 👉 🎈Биржевик | VipPirates')
+        create_limit_order(tiker, buy, summ, 1)
+
+
+# обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Черных мастер
+def chernihMaster_reading(text,tiker):
+    keyword4 = ['Покупаю', 'Куплю']
+    if search_any_keyword(text, keyword4):
+        buy = 'buy'
+        summ = risk(tiker)
+        print('long 👉 🎈Черных мастер Россия')
+        create_limit_order(tiker, buy, summ, 1)
+
+
+#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала cashflow публичный
+def cashflow_publick_reading(text,tiker):
+    keyword4 = ['ПОКУПКА ЛОНГ!', 'ВХОД:']
+    if search_any_keyword(text, keyword4):
+        buy = 'buy'
+        summ = risk(tiker)
+        print('long 👉 🎈СИГНАЛЫ от CASHFLOW')
+        create_limit_order(tiker, buy, summ, 1)

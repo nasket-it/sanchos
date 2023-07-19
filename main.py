@@ -1,10 +1,12 @@
 from secrete import Token
+# from message_reading import oleg_reading
 from telethon import *
 from all_functions import *
 from aiogram import Bot, Dispatcher , types, executor
+
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
-from AlorPy import AlorPy  # Работа с Alor OpenAPI V2
-from keywords import Keywords
+# from AlorPy import AlorPy  # Работа с Alor OpenAPI V2
+from keywords import Keywords, Risck
 from Config import Config  # Файл конфигурации
 from bs4 import BeautifulSoup
 
@@ -78,6 +80,13 @@ async def process_start_command(message: types.Message):
 async def buttons_press(callback_query):
     print(callback_query.data)
     if str(callback_query.data).split()[0] == '2':
+        tiker = str(callback_query.data).split()[-1]
+        print(tiker)
+        buy = 'buy'
+        print(buy)
+        summ = risk(tiker)
+        create_limit_order(tiker, buy, summ, 0)
+        await bot.send_message(-1001701470058,f'😱 full  - {tiker} {summ} {buy} ')
         await callback_query.answer()
     else:
         if str(callback_query.data).split()[0] == '0':
@@ -104,7 +113,7 @@ async def buttons_press(callback_query):
             await callback_query.answer()
 
 
-
+#обработка сообщений из каналов куплленных и пересылов со списка папперов Config.pamper_channels_id
 @client.on(events.NewMessage(chats=Config.pamper_channels_id))
 async def pamper_channels_handler(event):
     id_chennal = event.message.chat_id# достаем idчата или какнал от которо пришло сообщение
@@ -114,86 +123,58 @@ async def pamper_channels_handler(event):
         print(f'В данном тексте не обнаружены текеры MOEX')
     else:#если есть тикер в тексте
         # если сообщение от канала РДВ Premium | SS PRO
-        if id_chennal == Config.pamper_channels['РДВ Premium | SS PRO']:
-            keyword_RDV = ['OТКPЫТИE', 'LONG', 'CPOК', 'ИДEИ:', 'ДO'] #ключевые слова на покупку сигнала из сообщений этого канала
-            if keyword_search(text, keyword_RDV):# если в тексте сообщения есть ВСЕ!!! слова ключевые
-                buy = 'buy'# покупаем или продаем , настраивается вручную
-                summ = '100000'# сумма покупки , насраивается вручную
-                create_limit_order(tiker, buy, summ, 1)# функция покупки
-        # если сообщение от канала K-Trade | SS Exclusive'
-        if id_chennal == Config.pamper_channels['K - trade']:
-            keyword_KTrade = ['ЛОНГ', 'ВХОД:']
-            keyword_KTrade1 = ['ЗАХОДИМ', 'СПЕКУЛЯТИВНО']
-            keyword_KTrade2 = ['МОЖНО', 'ЗАЙТИ']
-            keyword_KTrade3 = ['МОЖНО', 'ВЗЯТЬ']
-            if keyword_search(text, keyword_KTrade) or keyword_search(text,keyword_KTrade1) or keyword_search(text,keyword_KTrade2) or keyword_search(text,keyword_KTrade3) :
-                buy = 'buy'
-                summ = '250000'
-                print('long')
-                create_limit_order(tiker, buy, summ, 1)
-        # если сообщение от канала Олег торгует
-        if id_chennal == Config.pamper_channels['Олег торгует']:
-            keyword_Oleg1 = ['#ИДЕЯ', 'ЛОНГ','ВХОД']
-            keyword_Oleg2 = ['ИДЕЯ', 'ЛОНГ','ВХОД']
-            if keyword_search(text, keyword_Oleg1) or keyword_search(text,keyword_Oleg2) :
-                buy = 'buy'
-                summ = '70000'
-                print('long')
-                create_limit_order(tiker, buy, summ, 1)
+        # if id_chennal == Config.pamper_channels['РДВ Premium | SS PRO']:
+        #     RDV_reading(text, tiker)
+        # # если сообщение от канала K-Trade | SS Exclusive'
+        # if id_chennal == Config.pamper_channels['K - trade']:
+        #     k_trade_reading(text, tiker)
+        # # если сообщение от канала Олег торгует
+        # if id_chennal == Config.pamper_channels['Олег торгует']:
+        #     oleg_reading(text, tiker)
         # если сообщение от канала Goodwin Production |GP Fund | 💎 | SS PRO Exclusive
-        if id_chennal == Config.pamper_channels['Goodwin Production |GP Fund | 💎 | SS PRO Exclusive']:
-            keyword_Goodwin1 = ['ПОКУПКА', 'СТОП','ПРОФИТЫ']
-            keyword_Goodwin2 = ['ПОКУПКА', 'СТОП','ПРОФИТ']
-            if keyword_search(text, keyword_Goodwin1) or keyword_search(text,keyword_Goodwin2) or search_any_keyword(text, Keywords.goodwin):
-                buy = 'buy'
-                summ = '250000'
-                print('long')
-                create_limit_order(tiker, buy, summ, 1)
-
-        if id_chennal == Config.pamper_channels['Чехов ВИП канал']:
-            keyword1 = ['ПРИКУПИТЕ', 'НЕМНОГО']
-            keyword2 = ['ПРИКУПИМ', 'НЕМНОГО']
-            keyword3 = ['ПОКУПАЕМ', 'НЕМНОГО']
-            keyword4 = ['ПОКУПАЮ', 'НЕМНОГО']
-            if keyword_search(text, keyword1) or keyword_search(text,keyword2) or keyword_search(text,keyword3) or keyword_search(text,keyword4):
-                buy = 'buy'
-                summ = '250000'
-                print('long')
-                create_limit_order(tiker, buy, summ, 1)
-
-        if id_chennal == Config.pamper_channels['Клуб ProfitKing']:
-                    keyword1 = ['КУПИЛ']
-                    keyword2 = ['ПОКУПКА']
-                    keyword3 = ['ВЗЯЛ']
-                    keyword4 = ['ПОКУПАЮ']
-                    keyword5 = ['ПЕРЕЗАХОЖУ']
-                    if len(str(text).split()) <= 12 and  keyword_search(text,keyword5) or keyword_search(text,keyword2) or keyword_search(text,keyword3) or keyword_search(text,keyword4) or keyword_search(text,keyword1):
-                        buy = 'buy'
-                        summ = '250000'
-                        print('long')
-                        create_limit_order(tiker, buy, summ, 1)
-
-
+        # if id_chennal == Config.pamper_channels['Goodwin Production |GP Fund | 💎 | SS PRO Exclusive']:
+        #     goodwin_reading(text, tiker)
+        # if id_chennal == Config.pamper_channels['Чехов ВИП канал']:
+        #     chehov_reading(text, tiker)
+        # if id_chennal == Config.pamper_channels['Клуб ProfitKing']:
+        #     ProfitKing_reading(text, tiker)
         if id_chennal == Config.pamper_channels['Биржевик | VipPirates']:
-                    keyword1 = ['ЛОНГ']
-                    keyword4 = ['⚡️Беру','беру', '⚡️Забираю']
-                    if search_any_keyword(text, keyword4) and keyword_search(text, keyword1):
-                        buy = 'buy'
-                        summ = '250000'
-                        print('long')
-                        create_limit_order(tiker, buy, summ, 1)
+            birgewik_reading(text, tiker)
+        # if id_chennal == Config.pamper_channels['Черных мастер Россия']:
+        #     chernihMaster_reading(text, tiker)
+        if id_chennal == Config.pamper_channels['СИГНАЛЫ от CASHFLOW']:
+            cashflow_publick_reading(text, tiker)
 
 
-        if id_chennal == Config.pamper_channels['Черных мастер Россия']:
-                    keyword1 = ['']
-                    keyword4 = ['Покупаю','Куплю']
-                    if search_any_keyword(text, keyword4) :
-                        buy = 'buy'
-                        summ = '250000'
-                        print('long')
-                        create_limit_order(tiker, buy, summ, 1)
-
-
+#обработка сообщений из канала fast&text only, разных памперов , пересыл без картинок и кажется быстрее
+@client.on(events.NewMessage(chats=Config.fast_id))
+async def vip_channels_handler(event):
+    id_chennal = event.message.chat_id  # достаем idчата или какнал от которо пришло сообщение
+    text = event.message.message  # достаем только текст сообщени
+    # print(text)
+    tiker = str(get_keyword_tiker_moex(text, Config.tickers_moex))  # находим тикер в тексте
+    header_message = str(event.message.message).split('\n')[0]#из каждого сообщения вырезаем заголовок , где указано с какого канала персыл
+    if tiker == '🤷‍♂':  # если в тексте нет тикера MOEX
+        print(f'В данном тексте не обнаружены текеры MOEX')
+    else:  # если есть тикер в тексте
+        if 'Переслано из K-trade' in  header_message:
+            print('🥵🥵🥵🥵🥵🥵🥵 - K-trade')
+            k_trade_reading(text, tiker)
+        if 'Переслано из GP INTRADAY' in  header_message:
+            print('🥵🥵🥵🥵🥵🥵🥵 - Goodwin Production')
+            goodwin_reading(text, tiker)
+        if 'Олег торгует' in  header_message:
+            oleg_reading(text, tiker)
+            print('🥵🥵🥵🥵🥵🥵🥵 - Олег торгует')
+        if 'Клуб ProfitKing' in  header_message:
+            print('🥵🥵🥵🥵🥵🥵🥵 - Клуб ProfitKing')
+            ProfitKing_reading(text, tiker)
+        if 'ВИП канал' in  header_message:
+            print('🥵🥵🥵🥵🥵🥵🥵 - Чехов ВИП канал')
+            chehov_reading(text, tiker)
+        if 'Мастер Россия' in  header_message:
+            print('🥵🥵🥵🥵🥵🥵🥵 - Черных мастер россия ')
+            chernihMaster_reading(text, tiker)
 
 
 
