@@ -1,9 +1,10 @@
 from secrete import Token
 # from message_reading import oleg_reading
+from datetime import datetime
 from telethon import *
 from all_functions import *
 from aiogram import Bot, Dispatcher , types, executor
-
+# from user_79065475988 import client2
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 # from AlorPy import AlorPy  # Работа с Alor OpenAPI V2
 from keywords import Keywords, Risck
@@ -33,21 +34,67 @@ api_id = Token.api_id  # задаем API
 api_hash = Token.api_hash  # задаем HASH
 phone = Token.phone
 
+async def get_dialodgs():
+    dialogs = await client2.get_dialogs()
+    dialogs = [f'{i.name} : {i.id}' for i in dialogs ]
+    print(dialogs)
 
-
+client2 = TelegramClient('my_account.session2', Token.api_id2, Token.api_hash2)
 client = TelegramClient('my_account.session', api_id, api_hash)
 
 
+
+#обработчик сообщений только из канала id из списка channel_vip_vip_id
+# @client2.on(events.NewMessage(chats=Config.channel_vip_vip_id))
+async def vip_channels_handler(event):
+    # достаем idчата или какнал от которо пришло сообщение
+    id_chennal = event.message.chat_id
+    # достаем сообщение полное с медиа
+    message = event.message
+    print(message.message)
+    # достаем только текст сообщени
+    text = event.message.message
+    if id_chennal == Config.channel_vip_dict['31. Antrading Official +| VipPirates']:
+        print(text)
+    #основная функция обработки сообщений , добавления клавиатур с кнопками
+    #находится в модуле all_funcctions.py
+    time_now =  datetime.now()
+    await reader_create_button(text, event, message, id_chennal,f'📬VIP_VIP-channel📬\n{time_now}', Config.channel_vip_vip_reverse)
+
+
+
+#отдельный клиент телеграмм и прямые платки
+@client2.on(events.NewMessage(chats=Config.channel_vip_vip_id))
+async def vip_channels_handler(event):
+    id_chennal = event.message.chat_id  # достаем idчата или какнал от которо пришло сообщение
+    text = event.message.message  # достаем только текст сообщени
+    message = event.message
+    #print(text)
+    # await get_dialodgs()
+    time_now = str(datetime.now())[11:-4]
+    await reader_create_button(text, event, message, id_chennal,f'📬VIP_VIP-channel📬\n⏰{time_now}⏰', Config.channel_vip_vip_reverse)
+    tiker = str(get_keyword_tiker_moex(text, Config.tickers_moex))  # находим тикер в тексте
+    if tiker == '🤷‍♂':  # если в тексте нет тикера MOEX
+        print(f'В данном тексте не обнаружены текеры MOEX')
+    else:  # если есть тикер в тексте
+        if id_chennal ==  Config.channel_vip_vip['Мастер Россия💰']:
+            time_now = str(datetime.now())[11:-4]
+            print('🥵🥵🥵 - Мастер Россия💰' , time_now)
+            chernihMaster_reading(text, tiker)
+        if id_chennal ==  Config.channel_vip_vip['Биржевик VIP | Инвестиции и Трейдинг💰']:
+            time_now = str(datetime.now())[11:-4]
+            print('🥵🥵🥵 - Биржевик VIP💰' , time_now)
+            birgewik_reading(text, tiker)
+        if id_chennal == Config.channel_vip_vip['ВИП канал💰']:
+            time_now = str(datetime.now())[11:-4]
+            print('🥵🥵🥵 - Чехов ВИП канал💰' , time_now)
+            chehov_reading(text, tiker)
 
 #в этой переменной храниться последнее сообщение отправленное в канал новостоной
 #перед отправкой следующего сообщения проверяется текст этого , для предотращения дублей
 check1 = 0
 all_signals = []
 
-async def get_dialodgs():
-    dialogs = await client.get_dialogs()
-    dialogs = [f'{i.name} : {i.id}' for i in dialogs ]
-    print(dialogs)
 
 
 #получаем все диалоги , функция корутина (запускается в самом низу листа )
@@ -122,28 +169,10 @@ async def pamper_channels_handler(event):
     if tiker == '🤷‍♂': #если в тексте нет тикера MOEX
         print(f'В данном тексте не обнаружены текеры MOEX')
     else:#если есть тикер в тексте
-        # если сообщение от канала РДВ Premium | SS PRO
-        # if id_chennal == Config.pamper_channels['РДВ Premium | SS PRO']:
-        #     RDV_reading(text, tiker)
-        # # если сообщение от канала K-Trade | SS Exclusive'
-        # if id_chennal == Config.pamper_channels['K - trade']:
-        #     k_trade_reading(text, tiker)
-        # # если сообщение от канала Олег торгует
-        # if id_chennal == Config.pamper_channels['Олег торгует']:
-        #     oleg_reading(text, tiker)
-        # если сообщение от канала Goodwin Production |GP Fund | 💎 | SS PRO Exclusive
-        # if id_chennal == Config.pamper_channels['Goodwin Production |GP Fund | 💎 | SS PRO Exclusive']:
-        #     goodwin_reading(text, tiker)
-        # if id_chennal == Config.pamper_channels['Чехов ВИП канал']:
-        #     chehov_reading(text, tiker)
-        # if id_chennal == Config.pamper_channels['Клуб ProfitKing']:
-        #     ProfitKing_reading(text, tiker)
-        if id_chennal == Config.pamper_channels['Биржевик | VipPirates']:
-            birgewik_reading(text, tiker)
-        # if id_chennal == Config.pamper_channels['Черных мастер Россия']:
-        #     chernihMaster_reading(text, tiker)
         if id_chennal == Config.pamper_channels['СИГНАЛЫ от CASHFLOW']:
             cashflow_publick_reading(text, tiker)
+        if id_chennal == Config.pamper_channels['МОСКОВСКИЙ ИНВЕСТОР']:
+            mosinvestor_publick_reading(text, tiker)
 
 
 #обработка сообщений из канала fast&text only, разных памперов , пересыл без картинок и кажется быстрее
@@ -163,18 +192,21 @@ async def vip_channels_handler(event):
         if 'Переслано из GP INTRADAY' in  header_message:
             print('🥵🥵🥵🥵🥵🥵🥵 - Goodwin Production')
             goodwin_reading(text, tiker)
-        if 'Олег торгует' in  header_message:
-            oleg_reading(text, tiker)
-            print('🥵🥵🥵🥵🥵🥵🥵 - Олег торгует')
+        # if 'Олег торгует' in  header_message:
+        #     oleg_reading(text, tiker)
+        #     print('🥵🥵🥵🥵🥵🥵🥵 - Олег торгует')
         if 'Клуб ProfitKing' in  header_message:
             print('🥵🥵🥵🥵🥵🥵🥵 - Клуб ProfitKing')
             ProfitKing_reading(text, tiker)
         if 'ВИП канал' in  header_message:
             print('🥵🥵🥵🥵🥵🥵🥵 - Чехов ВИП канал')
             chehov_reading(text, tiker)
-        if 'Мастер Россия' in  header_message:
+        if 'РФ+США' in  header_message:
             print('🥵🥵🥵🥵🥵🥵🥵 - Черных мастер россия ')
             chernihMaster_reading(text, tiker)
+        if 'Premium СИГНАЛЫ' in  header_message:
+            print('🥵🥵🥵🥵🥵🥵🥵 - Premium СИГНАЛЫ  ')
+            cashflow_vip_reading(text, tiker)
 
 
 
@@ -193,7 +225,10 @@ async def vip_channels_handler(event):
     text = event.message.message
     # основная функция обработки сообщений , добавления клавиатур с кнопками
     # находится в модуле all_funcctions.py
-    await reader_create_button(text, event, message, id_chennal, f'🐢 🛂Public - channel🛂', Config.channel_pyblic_dict_reverse)
+    if id_chennal == Config.channel_pyblic_dict['Оле торгует']:
+        print(event.message)
+    time_now = str(datetime.now())[11:-4]
+    await reader_create_button(text, event, message, id_chennal, f'🐢 🛂Public - channel🛂\n⏰{time_now}⏰', Config.channel_pyblic_dict_reverse)
 
 
 #обработчик сообщений только из канала id из списка channel_vip_id
@@ -210,7 +245,10 @@ async def vip_channels_handler(event):
         print(text)
     #основная функция обработки сообщений , добавления клавиатур с кнопками
     #находится в модуле all_funcctions.py
-    await reader_create_button(text, event, message, id_chennal,f'🔸VIP-channel', Config.channel_vip_dict_reverse)
+    time_now = str(datetime.now())[11:-4]
+    await reader_create_button(text, event, message, id_chennal,f'🔸VIP-channel\n⏰{time_now}⏰', Config.channel_vip_dict_reverse)
+
+
 
 
 #обработчик сообщений только из канала id из списка news_vip_id
@@ -226,7 +264,26 @@ async def vip_channels_handler(event):
     text = event.message.message
     #основная функция обработки сообщений , добавления клавиатур с кнопками
     #находится в модуле all_funcctions.py
-    await reader_create_button(text, event, message, id_chennal,f'📮 VIP-news', Config.news_vip_dict_reverse)
+    time_now = str(datetime.now())[11:-4]
+    await reader_create_button(text, event, message, id_chennal,f'📮 VIP-news\n⏰{time_now}⏰', Config.news_vip_dict_reverse)
+
+
+#
+# @client.on(events.NewMessage(chats=Config.tdmap_channels_id))
+async def vip_channels_handler(event):
+    user_id = event.message.from_id
+    # достаем idчата или какнал от которо пришло сообщение
+    id_chennal = event.message.chat_id
+    # print(id_chennal)
+    # достаем сообщение полное с медиа
+    message = event.message
+    # print(message)
+    # достаем только текст сообщени
+    text = event.message.message
+    #основная функция обработки сообщений , добавления клавиатур с кнопками
+    #находится в модуле all_funcctions.py
+    if user_id == Config.tdmap_user_id :
+        await reader_create_button(text, event, message, id_chennal,f'🪧🪧🪧 - TDmap - 🪧🪧🪧' , Config.tdmap_channels_reverse)
 
 
 
@@ -245,6 +302,7 @@ async def vip_channels_handler(event):
 if __name__ == '__main__':
     # Запуск клиента Telethon
     client.start()
+    client2.start()
     # Запуск бота aiogram
     executor.start_polling(dp)
     # client.loop.run_until_complete(main())

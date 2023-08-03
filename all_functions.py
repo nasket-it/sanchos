@@ -25,19 +25,21 @@ apProvider = AlorPy(Config.UserName, Config.RefreshToken)
 def risk(symbol):
     # if symbol.upper() in Risck.K380:
     #     return '380000'
-    if symbol.upper() in Risck.k400:
-        return '400000'
-    if symbol.upper() in Risck.k500:
-        return '500000'
-    if symbol.upper() in Risck.K470:
-        return '470000'
-    if symbol.upper() in Risck.k600:
-        return '600000'
-    if symbol.upper() in Risck.K650:
-        return '650000'
-    if symbol.upper() in Risck.K800:
-        return '800000'
-    return '300000'
+    if symbol.upper() in Risck.k470:
+        return '520000'
+    if symbol.upper() in Risck.k550:
+        return '620000'
+    if symbol.upper() in Risck.k590:
+        return '680000'
+    if symbol.upper() in Risck.k640:
+        return '720000'
+    if symbol.upper() in Risck.k680:
+        return '780000'
+    if symbol.upper() in Risck.k800:
+        return '900000'
+    if symbol.upper() in Risck.k950:
+        return '1000000'
+    return '400000'
 
 
 def decorator_speed(func):
@@ -200,7 +202,7 @@ def calculate_new_price(step, percent, price, is_increase=True):
     else:
         new_price = price - (price * percent / 100)
     if step >= 1 :
-        return round(new_price / step) * step
+        return int(round(new_price / step) * step)
     else:
         new_price = round(new_price / step) * step
         new_price = "{:.6f}".format(new_price)
@@ -240,7 +242,7 @@ def create_automatic_order(text):
 def keyword_search(text, keywords):
     text = text.upper()
     # print(text)
-    if all(keyword in text for keyword in keywords):
+    if all(keyword.upper() in text for keyword in keywords):
         return True
     else:
         return False
@@ -368,15 +370,21 @@ def create_limit_order(symbol, buy, summ, step_best_price, portfolio='D78230', e
     x = "asks" if buy == 'buy' else "bids"
     info = Config.info[symbol]
     lot = info['lotsize']
+    minstep = info['minstep']
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         price_future = executor.submit(get_price, symbol, x, step_best_price)
         price = price_future.result()
         lot = int(int(summ) // (lot * price))
         # price = calculate_new_price(info['minstep'], 0.4, price, x == 'asks')
-        apProvider.CreateLimitOrder(portfolio, exchange, symbol, buy, lot, float(price))
-        print(f'Цена покупки {float(price)}')
-        print(lot)
+        if minstep >= 1:
+            apProvider.CreateLimitOrder(portfolio, exchange, symbol, buy, lot, int(price))
+            print(f'Цена покупки int {int(price)}')
+            print(lot)
+        else:
+            apProvider.CreateLimitOrder(portfolio, exchange, symbol, buy, lot, float(price))
+            print(f'Цена покупки float {float(price)}')
+            print(lot)
 
 
 def get_request(url):
@@ -407,11 +415,13 @@ async def forward_messages(source_channel, destination_channel, time_interval, d
 def oleg_reading(text, tiker):
     keyword_Oleg1 = ['#ИДЕЯ', 'ЛОНГ', 'ВХОД']
     keyword_Oleg2 = ['ИДЕЯ', 'ЛОНГ', 'ВХОД']
-    if keyword_search(text, keyword_Oleg1) or keyword_search(text, keyword_Oleg2):
-        buy = 'buy'
-        summ = risk(tiker)
-        print('long - 👉 🎈Олег торгует')
-        create_limit_order(tiker, buy, summ, 1)
+    stop = ['GMKN', 'RUAL', 'SBER', 'GAZP', 'LKOH']
+    if tiker not in stop:
+        if keyword_search(text, keyword_Oleg1) or keyword_search(text, keyword_Oleg2):
+            buy = 'buy'
+            summ = risk(tiker)
+            print('long - 👉 🎈Олег торгует')
+            create_limit_order(tiker, buy, summ, 1)
 
 
 #обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала K-traide
@@ -435,30 +445,39 @@ def RDV_reading(text,tiker):
         buy = 'buy'  # покупаем или продаем , настраивается вручную
         summ = '100000'  # сумма покупки , насраивается вручную
         print('long - 👉 🎈РДВ Premium')
-        create_limit_order(tiker, buy, summ, 1)  # функция покупки
+        # create_limit_order(tiker, buy, summ, 1)  # функция покупки
 
 
 #обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Goodwin
 def goodwin_reading(text,tiker):
+    keyword_Goodwin1 = ['Покупка', 'Стоп' , 'Профит' ]
     if re.search('#скальпин',text, 1):
-        if search_re(text,Keywords.goodwin_short, 1):
-            print('🤬')
+        if keyword_search(text, keyword_Goodwin1):
+            buy = 'buy'
+            summ = risk(tiker)
+            print('long - 👉 🎈Goodwin Production')
+            create_limit_order(tiker, buy, summ, 1)
         else:
-            keyword_Goodwin1 = ['ПОКУПКА', 'СТОП']
-            if keyword_search(text, keyword_Goodwin1) or search_re(text,Keywords.goodwin2, 2):
-                buy = 'buy'
-                summ = risk(tiker)
-                print('long - 👉 🎈Goodwin Production')
-                create_limit_order(tiker, buy, summ, 1)
+            if search_re(text,Keywords.goodwin_short, 1):
+                print('🤬')
+            else:
+                if search_any_keyword(text, Keywords.goodwin) or search_re(text,Keywords.goodwin2, 2):
+                    buy = 'buy'
+                    summ = risk(tiker)
+                    print('long - 👉 🎈Goodwin Production')
+                    create_limit_order(tiker, buy, summ, 1)
 
 
 #обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Чехов вип
 def chehov_reading(text, tiker):
+    if search_any_keyword(text, Keywords.chehov_short):
+        print('stop -  👉 🎈Чехов ВИП канал')
+    else:
         keyword1 = ['ПРИКУПИТЕ', 'НЕМНОГО']
         keyword2 = ['ПРИКУПИМ', 'НЕМНОГО']
         keyword3 = ['ПОКУПАЕМ', 'НЕМНОГО']
         keyword4 = ['ПОКУПАЮ', 'НЕМНОГО']
-        if keyword_search(text, keyword1) or keyword_search(text, keyword2) or keyword_search(text,keyword3) or keyword_search(text, keyword4):
+        if keyword_search(text, keyword1) or keyword_search(text, keyword2) or keyword_search(text,keyword3) or keyword_search(text, keyword4) or search_any_keyword(text, Keywords.chehov):
             buy = 'buy'
             summ = risk(tiker)
             print('long - 👉 🎈Чехов ВИП канал')
@@ -483,21 +502,28 @@ def ProfitKing_reading(text,tiker):
 def birgewik_reading(text,tiker):
     keyword1 = ['цель', 'средняя', 'лонг']
     keyword4 = ['⚡️Беру', 'беру', '⚡️Забираю']
-    if search_any_keyword(text,Keywords.birgewik) and search_any_keyword(text,keyword1):
-        buy = 'buy'
-        summ = risk(tiker)
-        print('long 👉 🎈Биржевик | VipPirates')
-        create_limit_order(tiker, buy, summ, 1)
+    stop = ['GMKN', 'шорт', 'SBER', 'GAZP']
+    if tiker not in stop:
+        if search_any_keyword(text,Keywords.birgewik) and search_any_keyword(text,keyword1):
+            buy = 'buy'
+            summ = risk(tiker)
+            print('long 👉 🎈Биржевик | VipPirates')
+            create_limit_order(tiker, buy, summ, 1)
 
 
 # обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Черных мастер
 def chernihMaster_reading(text,tiker):
-    keyword4 = ['Покупаю', 'Куплю']
-    if search_any_keyword(text, keyword4):
-        buy = 'buy'
-        summ = risk(tiker)
-        print('long 👉 🎈Черных мастер Россия')
-        create_limit_order(tiker, buy, summ, 1)
+    keywords1 = ['не покупаю' , 'не куплю']
+    if search_any_keyword(text,keywords1 ):
+        print('stop 👉 🎈Черных мастер Россия')
+    else:
+        keyword4 = ['Покупаю', 'Куплю', 'Открываю лонг']
+        keyword5 = ['лонг', 'тeкущeй ']
+        if search_any_keyword(text, keyword4) or keyword_search(text, keyword5) :
+            buy = 'buy'
+            summ = risk(tiker)
+            print('long 👉 🎈Черных мастер Россия')
+            create_limit_order(tiker, buy, summ, 1)
 
 
 #обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала cashflow публичный
@@ -508,3 +534,24 @@ def cashflow_publick_reading(text,tiker):
         summ = risk(tiker)
         print('long 👉 🎈СИГНАЛЫ от CASHFLOW')
         create_limit_order(tiker, buy, summ, 1)
+
+
+
+def mosinvestor_publick_reading(text,tiker):
+    keyword4 = ['🚨Покупка', '🪙Цена:', '🏆Выход:']
+    if tiker in Config.rts2_3:
+        if search_any_keyword(text, keyword4):
+            buy = 'buy'
+            summ = risk(tiker)
+            print('long 👉 🎈СИГНАЛЫ МОСКОВСКИЙ ИНВЕСТОР')
+            create_limit_order(tiker, buy, summ, 1)
+
+def cashflow_vip_reading(text,tiker):
+    keyword4 = ['ПОКУПКА ЛОНГ!', 'ВХОД:']
+    if tiker in Config.rts2_3:
+        if search_any_keyword(text, keyword4):
+            buy = 'buy'
+            summ = risk(tiker)
+            # summ = '100000'
+            print('long 👉 🎈СИГНАЛЫ от CASHFLOW')
+            create_limit_order(tiker, buy, summ, 1)
