@@ -26,20 +26,20 @@ def risk(symbol):
     # if symbol.upper() in Risck.K380:
     #     return '380000'
     if symbol.upper() in Risck.k470:
-        return '520000'
+        return '560000'
     if symbol.upper() in Risck.k550:
-        return '620000'
+        return '660000'
     if symbol.upper() in Risck.k590:
-        return '680000'
-    if symbol.upper() in Risck.k640:
         return '720000'
+    if symbol.upper() in Risck.k640:
+        return '760000'
     if symbol.upper() in Risck.k680:
-        return '780000'
+        return '820000'
     if symbol.upper() in Risck.k800:
-        return '900000'
+        return '1020000'
     if symbol.upper() in Risck.k950:
-        return '1000000'
-    return '400000'
+        return '1220000'
+    return '480000'
 
 
 def decorator_speed(func):
@@ -396,20 +396,20 @@ def get_request(url):
     return response
 
 
-async def forward_messages(source_channel, destination_channel, time_interval, delay):
-    # Определение временных границ для получения истории сообщений
-    until_date = None
-    if time_interval > 0:
-        until_date = int(time.time())  # Текущая дата и время в Unix-формате
-        from_date = until_date - time_interval
-
-    # Получение истории сообщений канала за указанный временной интервал
-    async for message in client.iter_messages(source_channel, limit=10, reverse=True, from_user='me'):
-        # Задержка перед пересылкой сообщения в другой канал
-        # await asyncio.sleep(delay)
-        print(message)
-        # Пересылка сообщения в другой канал
-        # await client.forward_messages(destination_channel, message)
+# async def forward_messages(source_channel, destination_channel, time_interval, delay):
+#     # Определение временных границ для получения истории сообщений
+#     until_date = None
+#     if time_interval > 0:
+#         until_date = int(time.time())  # Текущая дата и время в Unix-формате
+#         from_date = until_date - time_interval
+#
+#     # Получение истории сообщений канала за указанный временной интервал
+#     async for message in client.iter_messages(source_channel, limit=10, reverse=True, from_user='me'):
+#         # Задержка перед пересылкой сообщения в другой канал
+#         # await asyncio.sleep(delay)
+#         print(message)
+#         # Пересылка сообщения в другой канал
+#         # await client.forward_messages(destination_channel, message)
 
 #обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Олег торгуе
 def oleg_reading(text, tiker):
@@ -451,7 +451,8 @@ def RDV_reading(text,tiker):
 #обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Goodwin
 def goodwin_reading(text,tiker):
     keyword_Goodwin1 = ['Покупка', 'Стоп' , 'Профит' ]
-    if re.search('#скальпин',text, 1):
+
+    if re.search('#скальпин',text, 1) or re.search('#срeднeсрок',text, 1):
         if keyword_search(text, keyword_Goodwin1):
             buy = 'buy'
             summ = risk(tiker)
@@ -529,7 +530,7 @@ def chernihMaster_reading(text,tiker):
 #обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала cashflow публичный
 def cashflow_publick_reading(text,tiker):
     keyword4 = ['ПОКУПКА ЛОНГ!', 'ВХОД:']
-    if search_any_keyword(text, keyword4):
+    if keyword_search(text, keyword4):
         buy = 'buy'
         summ = risk(tiker)
         print('long 👉 🎈СИГНАЛЫ от CASHFLOW')
@@ -540,7 +541,7 @@ def cashflow_publick_reading(text,tiker):
 def mosinvestor_publick_reading(text,tiker):
     keyword4 = ['🚨Покупка', '🪙Цена:', '🏆Выход:']
     if tiker in Config.rts2_3:
-        if search_any_keyword(text, keyword4):
+        if keyword_search(text, keyword4):
             buy = 'buy'
             summ = risk(tiker)
             print('long 👉 🎈СИГНАЛЫ МОСКОВСКИЙ ИНВЕСТОР')
@@ -549,9 +550,20 @@ def mosinvestor_publick_reading(text,tiker):
 def cashflow_vip_reading(text,tiker):
     keyword4 = ['ПОКУПКА ЛОНГ!', 'ВХОД:']
     if tiker in Config.rts2_3:
-        if search_any_keyword(text, keyword4):
+        if keyword_search(text, keyword4):
             buy = 'buy'
             summ = risk(tiker)
             # summ = '100000'
             print('long 👉 🎈СИГНАЛЫ от CASHFLOW')
             create_limit_order(tiker, buy, summ, 1)
+
+
+def kogan_vip_reading(text,tiker):
+    keyword4 = ['⚡️Покупаем', '#push']
+    keyword5 = ['⚡️Докупаем', '#push']
+    if keyword_search(text, keyword4) or keyword_search(text, keyword5) :
+        buy = 'buy'
+        summ = risk(tiker)
+        # summ = '100000'
+        print('long 👉 🎈Kogan vip')
+        create_limit_order(tiker, buy, summ, 1)

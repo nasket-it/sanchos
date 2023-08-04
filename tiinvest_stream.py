@@ -94,8 +94,8 @@ async def main():
         async for marketdata in client.market_data_stream.market_data_stream(
             request_iterator()
         ):
-            if 'orderbook' in  marketdata.orderbook:
-                bids_data = marketdata.orderbook.bids
+            if marketdata != None:
+                bids_data = marketdata.orderbook
 
                 print(bids_data)
 
