@@ -39,7 +39,7 @@ def risk(symbol):
         return '1020000'
     if symbol.upper() in Risck.k950:
         return '1220000'
-    return '480000'
+    return '470000'
 
 
 def decorator_speed(func):
