@@ -78,8 +78,8 @@ async def client_channels_handler(event):
     id_chennal = event.message.chat_id  # достаем idчата или какнал от которо пришло сообщение
     message = event.message  # достаем сообщение полное с медиа
     text = event.message.message  # достаем только текст сообщени
-    user_id = event.message.from_id.user_id # достаём id юзера
-    username = user_id.username
+    user_id = event.message.from_id # достаём id юзера
+    # username = user_id.username
     tiker = str(get_keyword_tiker_moex(text, Config.tickers_moex))  # находим тикер в тексте
     if id_chennal in Config.pamper_channels_id:
         if tiker == '🤷‍♂':  # если в тексте нет тикера MOEX
