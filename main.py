@@ -78,7 +78,7 @@ async def client_channels_handler(event):
     id_chennal = event.message.chat_id  # достаем idчата или какнал от которо пришло сообщение
     message = event.message  # достаем сообщение полное с медиа
     text = event.message.message  # достаем только текст сообщени
-    user_id = event.message.from_id # достаём id юзера
+    # user_id = message.from_id.user_id # достаём id юзер
     # username = user_id.username
     tiker = str(get_keyword_tiker_moex(text, Config.tickers_moex))  # находим тикер в тексте
     if id_chennal in Config.pamper_channels_id:
@@ -112,9 +112,9 @@ async def client_channels_handler(event):
             if 'РФ+США' in header_message:
                 print('🥵💸 - Черных мастер россия ')
                 chernihMaster_reading(text, tiker)
-            if 'Premium СИГНАЛЫ' in header_message:
-                print('🥵💸 - Premium СИГНАЛЫ  ')
-                cashflow_vip_reading(text, tiker)
+            # if 'Premium СИГНАЛЫ' in header_message:
+            #     print('🥵💸 - Premium СИГНАЛЫ  ')
+            #     cashflow_vip_reading(text, tiker)
     if id_chennal in Config.channel_pyblic_id:
         time_now = str(datetime.now())[11:-4]
         await reader_create_button(text, event, message, id_chennal, f'🐢 🛂Public - channel\n -- {time_now} 🕰',Config.channel_pyblic_dict_reverse)
@@ -128,7 +128,7 @@ async def client_channels_handler(event):
         time_now = str(datetime.now())[11:-4]
         await reader_create_button(text, event, message, id_chennal, f'📮 VIP-news\n -- {time_now} 🕰',Config.news_vip_dict_reverse)
     if id_chennal == Config.tdmap_channels_id:
-        if user_id == Config.tdmap_user_id:
+        if message.from_id.user_id == Config.tdmap_user_id:
             print(f'💂💂 - написал TDmap')
             try:
                 await reader_create_button(text, event, message, id_chennal, f'💂‍💂💂‍ - TDmap - 🪧',Config.tdmap_channels_reverse)
