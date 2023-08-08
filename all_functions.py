@@ -26,20 +26,20 @@ def risk(symbol):
     # if symbol.upper() in Risck.K380:
     #     return '380000'
     if symbol.upper() in Risck.k470:
-        return '560000'
+        return '550000'
     if symbol.upper() in Risck.k550:
-        return '660000'
+        return '650000'
     if symbol.upper() in Risck.k590:
-        return '720000'
+        return '710000'
     if symbol.upper() in Risck.k640:
-        return '760000'
+        return '750000'
     if symbol.upper() in Risck.k680:
-        return '820000'
+        return '810000'
     if symbol.upper() in Risck.k800:
-        return '1020000'
+        return '1010000'
     if symbol.upper() in Risck.k950:
-        return '1220000'
-    return '470000'
+        return '1210000'
+    return '460000'
 
 
 def decorator_speed(func):
