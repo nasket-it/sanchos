@@ -492,11 +492,13 @@ def ProfitKing_reading(text,tiker):
     keyword3 = ['ВЗЯЛ']
     keyword4 = ['ПОКУПАЮ']
     keyword5 = ['ПЕРЕЗАХОЖУ']
-    if len(str(text).split()) <= 12 and keyword_search(text, keyword5) or keyword_search(text,keyword2) or keyword_search(text, keyword3) or keyword_search(text, keyword4) or keyword_search(text, keyword1):
-        buy = 'buy'
-        summ = risk(tiker)
-        print('long - 👉 🎈Клуб ProfitKing')
-        create_limit_order(tiker, buy, summ, 1)
+    stop = 'Россети'
+    if stop.upper() not in text.upper():
+        if len(str(text).split()) <= 12 and keyword_search(text, keyword5) or keyword_search(text,keyword2) or keyword_search(text, keyword3) or keyword_search(text, keyword4) or keyword_search(text, keyword1):
+            buy = 'buy'
+            summ = risk(tiker)
+            print('long - 👉 🎈Клуб ProfitKing')
+            create_limit_order(tiker, buy, summ, 1)
 
 
 #обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Биржевик
