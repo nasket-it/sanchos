@@ -85,8 +85,8 @@ async def client_channels_handler(event):
         if tiker == '🤷‍♂':  # если в тексте нет тикера MOEX
             print(f'В данном тексте не обнаружены текеры MOEX')
         else:  # если есть тикер в тексте
-            if id_chennal == Config.pamper_channels['СИГНАЛЫ от CASHFLOW']:
-                cashflow_publick_reading(text, tiker)
+            # if id_chennal == Config.pamper_channels['СИГНАЛЫ от CASHFLOW']:
+            #     cashflow_publick_reading(text, tiker)
             if id_chennal == Config.pamper_channels['МОСКОВСКИЙ ИНВЕСТОР']:
                 mosinvestor_publick_reading(text, tiker)
     if id_chennal == Config.fast_id:
@@ -112,9 +112,9 @@ async def client_channels_handler(event):
             if 'РФ+США' in header_message:
                 print('🥵💸 - Черных мастер россия ')
                 chernihMaster_reading(text, tiker)
-            # if 'Premium СИГНАЛЫ' in header_message:
-            #     print('🥵💸 - Premium СИГНАЛЫ  ')
-            #     cashflow_vip_reading(text, tiker)
+            if 'Premium СИГНАЛЫ' in header_message:
+                print('🥵💸 - Premium СИГНАЛЫ  ')
+                cashflow_vip_reading(text, tiker)
     if id_chennal in Config.channel_pyblic_id:
         time_now = str(datetime.now())[11:-4]
         await reader_create_button(text, event, message, id_chennal, f'🐢 🛂Public - channel\n -- {time_now} 🕰',Config.channel_pyblic_dict_reverse)
