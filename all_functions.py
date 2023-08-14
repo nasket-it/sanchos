@@ -532,7 +532,8 @@ def chernihMaster_reading(text,tiker):
 #обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала cashflow публичный
 def cashflow_publick_reading(text,tiker):
     keyword4 = ['ПОКУПКА ЛОНГ!', 'ВХОД:']
-    if keyword_search(text, keyword4):
+    keyword5 = ['ПОКУПКА LONG!', 'ВХОД:']
+    if keyword_search(text, keyword4) or keyword_search(text, keyword5):
         buy = 'buy'
         summ = risk(tiker)
         print('long 👉 🎈СИГНАЛЫ от CASHFLOW')
@@ -551,7 +552,8 @@ def mosinvestor_publick_reading(text,tiker):
 
 def cashflow_vip_reading(text,tiker):
     keyword4 = ['ПОКУПКА ЛОНГ!', 'ВХОД:']
-    if tiker in Config.rts2_3:
+    keyword5 = ['ПОКУПКА LONG!', 'ВХОД:']
+    if keyword_search(text, keyword4) or keyword_search(text, keyword5):
         if keyword_search(text, keyword4):
             buy = 'buy'
             summ = risk(tiker)
