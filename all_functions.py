@@ -458,15 +458,15 @@ def goodwin_reading(text,tiker):
             summ = risk(tiker)
             print('long - 👉 🎈Goodwin Production')
             create_limit_order(tiker, buy, summ, 1)
-        else:
-            if search_re(text,Keywords.goodwin_short, 1):
-                print('🤬')
-            else:
-                if search_any_keyword(text, Keywords.goodwin) or search_re(text,Keywords.goodwin2, 2):
-                    buy = 'buy'
-                    summ = risk(tiker)
-                    print('long - 👉 🎈Goodwin Production')
-                    create_limit_order(tiker, buy, summ, 1)
+        # else:
+        #     if search_re(text,Keywords.goodwin_short, 1):
+        #         print('🤬')
+        #     else:
+        #         if search_any_keyword(text, Keywords.goodwin) or search_re(text,Keywords.goodwin2, 2):
+        #             buy = 'buy'
+        #             summ = risk(tiker)
+        #             print('long - 👉 🎈Goodwin Production')
+        #             create_limit_order(tiker, buy, summ, 1)
 
 
 #обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Чехов вип

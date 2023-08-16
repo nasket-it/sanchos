@@ -85,8 +85,8 @@ async def client_channels_handler(event):
         if tiker == '🤷‍♂':  # если в тексте нет тикера MOEX
             print(f'В данном тексте не обнаружены текеры MOEX')
         else:  # если есть тикер в тексте
-            # if id_chennal == Config.pamper_channels['СИГНАЛЫ от CASHFLOW']:
-            #     cashflow_publick_reading(text, tiker)
+            if id_chennal == Config.pamper_channels['СИГНАЛЫ от CASHFLOW']:
+                cashflow_publick_reading(text, tiker)
             if id_chennal == Config.pamper_channels['МОСКОВСКИЙ ИНВЕСТОР']:
                 mosinvestor_publick_reading(text, tiker)
     if id_chennal == Config.fast_id:
