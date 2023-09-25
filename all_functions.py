@@ -1,5 +1,5 @@
 from numba import njit
-from main import bot, client
+
 from AlorPy import AlorPy  # Работа с Alor OpenAPI V2
 from Config import *
 from keywords import Keywords, Risck
@@ -9,7 +9,19 @@ import time
 import re
 from datetime import datetime
 import requests
+from audio_text import audio_to_text, convert_ogg_wav
+import os
+import asyncio
 
+
+async def delete_oga_files(directory='.'):
+    while True:
+        for filename in os.listdir(directory):
+            if filename.endswith('.oga'):
+                os.remove(filename)
+                print(f'Файл {filename} удалён')
+        await asyncio.sleep(120)  # задержка, чтобы функция не зацикливалась и не перегружала процессор
+        print('Работае функция удаления файлов')
 
 
 #
@@ -26,20 +38,20 @@ def risk(symbol):
     # if symbol.upper() in Risck.K380:
     #     return '380000'
     if symbol.upper() in Risck.k470:
-        return '550000'
+        return '700000'
     if symbol.upper() in Risck.k550:
-        return '650000'
+        return '1000000'
     if symbol.upper() in Risck.k590:
-        return '710000'
+        return '1000000'
     if symbol.upper() in Risck.k640:
-        return '750000'
+        return '1100000'
     if symbol.upper() in Risck.k680:
-        return '810000'
+        return '1300000'
     if symbol.upper() in Risck.k800:
-        return '1010000'
+        return '1700000'
     if symbol.upper() in Risck.k950:
-        return '1210000'
-    return '460000'
+        return '2000000'
+    return '600000'
 
 
 def decorator_speed(func):
@@ -89,30 +101,43 @@ async def get_keyword(text, keywords):
 #возвращает список очищенный ключевых слов, очищает все что стоит впереди слова и сзади ,
 #если ключевое слово в середине слова , то функция его не найдет , если ключевые слова в тексте
 #не найдены , возращает смайлик '🤷‍♂'
-def get_keyword_tiker_moex(text, keyword):
+def get_keyword_tiker_moex(text, dictionary):
     #text: текст для парсисинга , str
     #keyword: список ключевых слов , которых нужно достать из текста , list
-    ddd = []
-    text = str(text)
-    text = text.split()#разбиваем текст н аслова
+    # Разбиваем текст на слова
+    words = text.split()
+
+    # Создаем пустой список для ключевых слов
+    keywords = []
+
+    # Проверяем каждое слово на наличие в словаре
+    for word in words:
+        # Удаляем все символы, кроме букв и цифр
+        clean_word = re.sub(r'[^\w]', '', word)
+        if clean_word in dictionary:
+            keywords.append(clean_word)
+    # ddd = []
+    # text = str(text)
+    # text = text.split()#разбиваем текст н аслова
+    # # print(text)
+    # for i in text:#перебираем каждое слово из текста
+    #     for y in keyword:#берем каждое ключевое слова из заданного спика
+    #
+    #         rez = i.upper().partition(y)#слово из текста переволим в верхний регистр , метод partition
+    #         #находит первое вхождение ключевого слова в начале или вконце и возращает список с найденными или пустым
+    #         if rez[1] != '':#если список не  пустой
+    #             if rez[1] in ddd:#и этого значения еще нет в списке результатов
+    #                 continue#если есть такой уже в списке результатов , начинаем со следующего слова
+    #             ddd.append(rez[1])#добавляем в список результатта
     # print(text)
-    for i in text:#перебираем каждое слово из текста
-        for y in keyword:#берем каждое ключевое слова из заданного спика
-            rez = i.upper().partition(y)#слово из текста переволим в верхний регистр , метод partition
-            #находит первое вхождение ключевого слова в начале или вконце и возращает список с найденными или пустым
-            if rez[1] != '':#если список не  пустой
-                if rez[1] in ddd:#и этого значения еще нет в списке результатов
-                    continue#если есть такой уже в списке результатов , начинаем со следующего слова
-                ddd.append(rez[1])#добавляем в список результатта
-    # print(text)
-    for i in text:#перебираем текст
+    for i in words:#перебираем текст
         # print(i.upper())
         if i.upper() in Config.dict_keywod_tiker:#проверяем на наличие ключей в словаре с ключевыми словами и занчениями в тикерах
             # print(i.upper())
-            if Config.dict_keywod_tiker[i.upper()] in ddd:#если результат есть всловаре результатов
+            if Config.dict_keywod_tiker[i.upper()] in keywords:#если результат есть всловаре результатов
                 continue#прерываем иттерацию  и берем следующее слово
-            ddd.append(Config.dict_keywod_tiker[i.upper()])#добавляем слово в спиок результатов
-    return ddd[0] if len(ddd) >= 1 else '🤷‍♂'#
+            keywords.append(Config.dict_keywod_tiker[i.upper()])#добавляем слово в спиок результатов
+    return keywords[0] if len(keywords) >= 1 else '🤷‍♂'#
 
     # text = [str(i).upper() for i in text.split()[0:7]]
     # def func(str):
@@ -271,7 +296,7 @@ def get_symbol(symbol, exchange='MOEX'):
 
 
 #чтец телеграмм и создать кнопок
-async def reader_create_button(text, event , message, id_chennal, smiley,chanell_dict_reverse, **kwargs):
+async def reader_create_button(text, event , message, id_chennal, smiley,chanell_dict_reverse,bot,  **kwargs):
     tiker = str(get_keyword_tiker_moex(text, Config.tickers_moex))
     if tiker == '🤷‍♂':
         markup = InlineKeyboardMarkup()
@@ -279,8 +304,8 @@ async def reader_create_button(text, event , message, id_chennal, smiley,chanell
         but_1 = InlineKeyboardButton(f'🤷‍♂ Тикер акции MOEX не найден', callback_data=f'2 10000 buy {tiker}')
         markup.add(but_1)
         # редактируем текст сообщениия , добавляем имя канала в переменной chat_name {Config.channel_vip_dict_reverse[id_chennal]
-        event.message.text = f'{smiley}\n\n{chanell_dict_reverse[id_chennal]}' + f"\n\n{event.message.text}"
-        await bot.send_message(-1001701470058, message.message, reply_markup=markup)
+        text = f'{smiley}\n\n{chanell_dict_reverse[id_chennal]}' + f"\n\n{text}"
+        await bot.send_message(-1001701470058, text, reply_markup=markup)
     else:
         key_word = ['идея', '#идея', 'лонг', 'long', 'покупаю',
                     'купил', 'шорт', 'short', 'продаю', 'продал',
@@ -306,10 +331,10 @@ async def reader_create_button(text, event , message, id_chennal, smiley,chanell
                 # добавляем кнопку в клавиатуру
                 markup.add(but_1, but_2, but_3, but_4, but_5, but_6, but_7, but_8)
                 # редактируем текст сообщениия , добавляем имя канала в переменной chat_name {Config.channel_vip_dict_reverse[id_chennal]
-                event.message.text = f'{smiley}\n\n{chanell_dict_reverse[id_chennal]}' + f"\n\n{event.message.text}"
+                text = f'{smiley}\n\n{chanell_dict_reverse[id_chennal]}' + f"\n\n{text}"
                 # print('long')
                 # отправка сообщения ботом в канал с клавиатурой
-                await bot.send_message(-1001701470058, message.message, reply_markup=markup)
+                await bot.send_message(-1001701470058, text, reply_markup=markup)
                 # print(f'{"Покупка"} : {tiker}')
             key_word_short = ['шорт', 'short', 'продаю', 'продал', 'закрыл лонг', 'фиксирую',
                               'зафиксировал', 'фиксируем', 'закрыл', 'закрываю', 'закройте',
@@ -333,9 +358,9 @@ async def reader_create_button(text, event , message, id_chennal, smiley,chanell
                 markup.add(but_1, but_2, but_3, but_4, but_5, but_6, but_7, but_8)
                 print('short')
                 # редактируем текст сообщениия , добавляем имя канала в переменной chat_name {Config.channel_vip_dict_reverse[id_chennal]
-                event.message.text = f'{smiley}\n\n{chanell_dict_reverse[id_chennal]}' + f"\n\n{event.message.text}"
+                text = f'{smiley}\n\n{chanell_dict_reverse[id_chennal]}' + f"\n\n{text}"
                 # отправка сообщения ботом в канал с клавиатурой
-                await bot.send_message(-1001701470058, message.message, reply_markup=markup)
+                await bot.send_message(-1001701470058, text, reply_markup=markup)
         else:
             # tiker = str(get_keyword_tiker_moex(text, Config.tickers_moex))
             # создаем клавиатуру
@@ -352,16 +377,19 @@ async def reader_create_button(text, event , message, id_chennal, smiley,chanell
             # добавляем кнопку в клавиатуру
             markup.add(but_1, but_2, but_3, but_4, but_5, but_6, but_7, but_8)
             # редактируем текст сообщениия , добавляем имя канала в переменной chat_name {Config.channel_vip_dict_reverse[id_chennal]
-            event.message.text = f'{smiley}\n\n{chanell_dict_reverse[id_chennal]}' + f"\n\n{event.message.text}"
+            text = f'{smiley}\n\n{chanell_dict_reverse[id_chennal]}' + f"\n\n{text}"
             # print('long')
             # отправка сообщения ботом в канал с клавиатурой
-            await bot.send_message(-1001701470058, message.message, reply_markup=markup)
+            await bot.send_message(-1001701470058, text, reply_markup=markup)
 
 
 import concurrent.futures
 
 
 def get_price(symbol, x, step_best_price):
+    #symbol = тикер
+    #x = bids или asks
+    #step_best_price = шаг цены в стакане, где [0] - лучшая цена в стакане и далее по всей глубине стакана
     price = get_orderbook(symbol)
     return price[x][step_best_price]["price"]
 
@@ -396,178 +424,37 @@ def get_request(url):
     return response
 
 
-# async def forward_messages(source_channel, destination_channel, time_interval, delay):
-#     # Определение временных границ для получения истории сообщений
-#     until_date = None
-#     if time_interval > 0:
-#         until_date = int(time.time())  # Текущая дата и время в Unix-формате
-#         from_date = until_date - time_interval
-#
-#     # Получение истории сообщений канала за указанный временной интервал
-#     async for message in client.iter_messages(source_channel, limit=10, reverse=True, from_user='me'):
-#         # Задержка перед пересылкой сообщения в другой канал
-#         # await asyncio.sleep(delay)
-#         print(message)
-#         # Пересылка сообщения в другой канал
-#         # await client.forward_messages(destination_channel, message)
-
-#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Олег торгуе
-def oleg_reading(text, tiker):
-    keyword_Oleg1 = ['#ИДЕЯ', 'ЛОНГ', 'ВХОД']
-    keyword_Oleg2 = ['ИДЕЯ', 'ЛОНГ', 'ВХОД']
-    stop = ['GMKN', 'RUAL', 'SBER', 'GAZP', 'LKOH']
-    if tiker not in stop:
-        if keyword_search(text, keyword_Oleg1) or keyword_search(text, keyword_Oleg2):
-            buy = 'buy'
-            summ = risk(tiker)
-            print('long - 👉 🎈Олег торгует')
-            create_limit_order(tiker, buy, summ, 1)
 
 
-#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала K-traide
-def k_trade_reading(text, tiker):
-    keyword_KTrade = ['ЛОНГ', 'ВХОД:']
-    keyword_KTrade1 = ['ЗАХОДИМ', 'СПЕКУЛЯТИВНО']
-    keyword_KTrade2 = ['МОЖНО', 'ЗАЙТИ']
-    keyword_KTrade3 = ['МОЖНО', 'ВЗЯТЬ']
-    if keyword_search(text, keyword_KTrade) or keyword_search(text, keyword_KTrade1) or keyword_search(text,keyword_KTrade2) or keyword_search(text, keyword_KTrade3):
-        buy = 'buy'
-        summ = risk(tiker)
-        print('long - 👉 🎈K - trade ')
-        create_limit_order(tiker, buy, summ, 1)
-
-
-#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала RDV - премиум
-def RDV_reading(text,tiker):
-    keyword_RDV = ['OТКPЫТИE', 'LONG', 'CPOК', 'ИДEИ:',
-                   'ДO']  # ключевые слова на покупку сигнала из сообщений этого канала
-    if keyword_search(text, keyword_RDV):  # если в тексте сообщения есть ВСЕ!!! слова ключевые
-        buy = 'buy'  # покупаем или продаем , настраивается вручную
-        summ = '100000'  # сумма покупки , насраивается вручную
-        print('long - 👉 🎈РДВ Premium')
-        # create_limit_order(tiker, buy, summ, 1)  # функция покупки
-
-
-#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Goodwin
-def goodwin_reading(text,tiker):
-    keyword_Goodwin1 = ['Покупка', 'Стоп' , 'Профит' ]
-
-    if re.search('#скальпин',text, 1) or re.search('#срeднeсрок',text, 1):
-        if keyword_search(text, keyword_Goodwin1):
-            buy = 'buy'
-            summ = risk(tiker)
-            print('long - 👉 🎈Goodwin Production')
-            create_limit_order(tiker, buy, summ, 1)
-        # else:
-        #     if search_re(text,Keywords.goodwin_short, 1):
-        #         print('🤬')
-        #     else:
-        #         if search_any_keyword(text, Keywords.goodwin) or search_re(text,Keywords.goodwin2, 2):
-        #             buy = 'buy'
-        #             summ = risk(tiker)
-        #             print('long - 👉 🎈Goodwin Production')
-        #             create_limit_order(tiker, buy, summ, 1)
-
-
-#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Чехов вип
-def chehov_reading(text, tiker):
-    if search_any_keyword(text, Keywords.chehov_short):
-        print('stop -  👉 🎈Чехов ВИП канал')
+async def convert_audio_text(event, client):
+    if event.message.voice:
+        voice_message = event.message.voice
+        # Скачиваем голосовое сообщение
+        voice_data = await client.download_file(voice_message)
+        with open('voice_message.ogg', 'wb') as f:
+            f.write(voice_data)
+        convert_ogg_wav('voice_message.ogg')
+        if voice_data:
+            print('ПРеобразую звук в текст')
+            audiotext = audio_to_text('voice_message.wav')
+            return audiotext
     else:
-        keyword1 = ['ПРИКУПИТЕ', 'НЕМНОГО']
-        keyword2 = ['ПРИКУПИМ', 'НЕМНОГО']
-        keyword3 = ['ПОКУПАЕМ', 'НЕМНОГО']
-        keyword4 = ['ПОКУПАЮ', 'НЕМНОГО']
-        if keyword_search(text, keyword1) or keyword_search(text, keyword2) or keyword_search(text,keyword3) or keyword_search(text, keyword4) or search_any_keyword(text, Keywords.chehov):
-            buy = 'buy'
-            summ = risk(tiker)
-            print('long - 👉 🎈Чехов ВИП канал')
-            create_limit_order(tiker, buy, summ, 1)
-
-
-#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала ProfitKing
-def ProfitKing_reading(text,tiker):
-    keyword1 = ['КУПИЛ']
-    keyword2 = ['ПОКУПКА']
-    keyword3 = ['ВЗЯЛ']
-    keyword4 = ['ПОКУПАЮ']
-    keyword5 = ['ПЕРЕЗАХОЖУ']
-    stop = 'Россети'
-    if stop.upper() not in text.upper():
-        if len(str(text).split()) <= 12 and keyword_search(text, keyword5) or keyword_search(text,keyword2) or keyword_search(text, keyword3) or keyword_search(text, keyword4) or keyword_search(text, keyword1):
-            buy = 'buy'
-            summ = risk(tiker)
-            print('long - 👉 🎈Клуб ProfitKing')
-            create_limit_order(tiker, buy, summ, 1)
-
-
-#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Биржевик
-def birgewik_reading(text,tiker):
-    keyword1 = ['цель', 'средняя', 'лонг']
-    keyword4 = ['⚡️Беру', 'беру', '⚡️Забираю']
-    stop = ['GMKN', 'шорт', 'SBER', 'GAZP']
-    if tiker not in stop:
-        if search_any_keyword(text,Keywords.birgewik) and search_any_keyword(text,keyword1):
-            buy = 'buy'
-            summ = risk(tiker)
-            print('long 👉 🎈Биржевик | VipPirates')
-            create_limit_order(tiker, buy, summ, 1)
-
-
-# обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала Черных мастер
-def chernihMaster_reading(text,tiker):
-    keywords1 = ['не покупаю' , 'не куплю']
-    if search_any_keyword(text,keywords1 ):
-        print('stop 👉 🎈Черных мастер Россия')
-    else:
-        keyword4 = ['Покупаю', 'Куплю', 'Открываю лонг']
-        keyword5 = ['лонг', 'тeкущeй ']
-        if search_any_keyword(text, keyword4) or keyword_search(text, keyword5) :
-            buy = 'buy'
-            summ = risk(tiker)
-            print('long 👉 🎈Черных мастер Россия')
-            create_limit_order(tiker, buy, summ, 1)
-
-
-#обработка сообщений по ключевым словам и выставление лимитной заявки для сообщений какнала cashflow публичный
-def cashflow_publick_reading(text,tiker):
-    keyword4 = ['ПОКУПКА ЛОНГ!', 'ВХОД:']
-    keyword5 = ['ПОКУПКА LONG!', 'ВХОД:']
-    if keyword_search(text, keyword4) or keyword_search(text, keyword5):
-        buy = 'buy'
-        summ = risk(tiker)
-        print('long 👉 🎈СИГНАЛЫ от CASHFLOW')
-        create_limit_order(tiker, buy, summ, 1)
+        print('В данном сообщении голосового не обнаружено')
+        return None
 
 
 
-def mosinvestor_publick_reading(text,tiker):
-    keyword4 = ['🚨Покупка', '🪙Цена:', '🏆Выход:']
-    if tiker in Config.rts2_3:
-        if keyword_search(text, keyword4):
-            buy = 'buy'
-            summ = risk(tiker)
-            print('long 👉 🎈СИГНАЛЫ МОСКОВСКИЙ ИНВЕСТОР')
-            create_limit_order(tiker, buy, summ, 1)
 
-def cashflow_vip_reading(text,tiker):
-    keyword4 = ['ПОКУПКА ЛОНГ!', 'ВХОД:']
-    keyword5 = ['ПОКУПКА LONG!', 'ВХОД:']
-    if keyword_search(text, keyword4) or keyword_search(text, keyword5):
-        if keyword_search(text, keyword4):
-            buy = 'buy'
-            summ = risk(tiker)
-            # summ = '100000'
-            print('long 👉 🎈СИГНАЛЫ от CASHFLOW')
-            create_limit_order(tiker, buy, summ, 1)
-
-
-def kogan_vip_reading(text,tiker):
-    keyword4 = ['⚡️Покупаем', '#push']
-    keyword5 = ['⚡️Докупаем', '#push']
-    if keyword_search(text, keyword4) or keyword_search(text, keyword5) :
-        buy = 'buy'
-        summ = risk(tiker)
-        # summ = '100000'
-        print('long 👉 🎈Kogan vip')
-        create_limit_order(tiker, buy, summ, 1)
+ #функция нажатия инлайн кнопки и возврата текста который должен появиться по нажатию кнопки
+async def nazatie_knopki(event, client, types, events):
+    #event - необработанное сообщение
+    #client - клиент телеграмм
+    #types - модуль  telethon
+    #events - модуль  telethon
+    if event.message.reply_markup and event.message.reply_markup.rows:
+        inline_button = event.message.reply_markup.rows[0].buttons[0]
+        if isinstance(inline_button, types.KeyboardButtonCallback):
+            await client.send_callback_query(event.chat_id, event.message.id, data=inline_button.data)
+            response_message = await client.listen(events.NewMessage(incoming=True, from_users=event.sender_id))
+            text = response_message.message
+            return text

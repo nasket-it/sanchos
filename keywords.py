@@ -37,8 +37,10 @@ class Keywords:
 
     birgewik = ['покупаю', '⚡️Беру', 'беру', '⚡️Забираю', '⚡️Докупаю']
 
-    chehov = ['ПРИКУПИТЕ', 'ПРИКУПИМ', 'ПОКУПАЮ', 'ПОКУПАЕМ' , 'купите', 'Лонг']
-    chehov_short = ['не покупаем' , 'не покупаю', 'не купите']
+    chehov = ['ПРИКУПИТЕ', 'ПРИКУПИМ', 'ПОКУПАЮ', 'ПОКУПАЕМ' , 'купите', 'Лонг', 'Давайте докупим']
+    chehov_short = ['не покупаем' , 'не покупаю', 'не купите', 'шорт', 'short']
+    chernih_short = ['не покупаю' , 'не куплю', 'закрываю', 'коррeкцию','крыть','буду крыть', 'Сокра', 'шорт', 'Закр', 'Прода', 'Закрываю', 'Закрыл', 'бeзуб', 'профит', 'Закрываю', 'фикс' , 'остат', 'вниз', 'разгру', 'коррeкцию']
+
 
 
 
@@ -54,4 +56,5 @@ class Risck:
     k640 = ['UPRO', 'FLOT', 'ELFV', 'ENPG', 'GLTR', 'LSNGP', 'RNFT', 'TRNFP', 'NKNCP' ]
     k680 = ['YNDX', 'TCSG', 'ROSN','NVTK', 'LKOH', 'ALRS']
     k800 = ['CHMF','NLMK', 'SNGS', 'FIVE', 'SNGSP', 'AGRO', 'HYDR', 'PIKK', 'RUAL' ]
-    k950 = ['MAGN', 'RASP' ,'MOEX', 'SBER', 'GAZP',  'PLZL',  'TATN', 'MTSS',  'GMKN', 'PHOR', 'SIBN', 'MGNT' ]
+    k950 = ['MAGN', 'RASP' ,'MOEX', 'SBER', 'GAZP',  'PLZL',  'TATN', 'MTSS',  'GMKN', 'PHOR', 'SIBN', 'MGNT' , 'VTBR']
+    blu_tikers = k950 + k800 + k680
