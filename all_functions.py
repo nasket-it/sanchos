@@ -13,15 +13,12 @@ from audio_text import audio_to_text, convert_ogg_wav
 import os
 import asyncio
 
-
+# print(datetime.now().second , datetime.now().microsecond)
 async def delete_oga_files(directory='.'):
-    while True:
-        for filename in os.listdir(directory):
-            if filename.endswith('.oga'):
-                os.remove(filename)
-                print(f'Файл {filename} удалён')
-        await asyncio.sleep(120)  # задержка, чтобы функция не зацикливалась и не перегружала процессор
-        print('Работае функция удаления файлов')
+    for filename in os.listdir(directory):
+        if filename.endswith('.oga'):
+            os.remove(filename)
+            print(f'Файл {filename} удалён')
 
 
 #
@@ -179,7 +176,7 @@ def get_pozicion():
         str += f'{key} - {value}\n'
     return str
 
-
+# get_pozicion()
 def get_orders():
     str = ''
     rezult = apProvider.GetOrders(Config.PortfolioStocks, Config.exchange)
@@ -204,9 +201,9 @@ def get_portfolio():
     for key, value in rezult.items():
         str += f'{lis[c]} - {value}\n'
         c += 1
-    return str
+    return rezult
 
-
+# get_portfolio()
 # #создать  лимитную заявку
 # def create_limit_order(symbol, buy, summ,step_best_price ,portfolio='D78230',exchange='MOEX'):
 #     x = "asks" if buy == 'buy' else "bids"
@@ -221,7 +218,10 @@ def get_portfolio():
 
 #функция формирование цены заявки с учетом шага цены , лотностью инструмента на бирже
 def calculate_new_price(step, percent, price, is_increase=True):
-    # decimal_part = str(price).split('.')[1]
+    #step - шаг минималльной цены акции
+    #percent - процент
+    #price - цена
+    #is_increase - показатель вычисления процента , либо вверх либо вниз,  + или - % от цены .
     if is_increase:
         new_price = price + (price * percent / 100)
     else:

@@ -62,6 +62,7 @@ def main():
 #обработка входящих сообщений телеграм на номер client2
 @client2.on(events.NewMessage(chats=Config.channel_vip_vip_id))
 async def client2_channels_handler(event):
+    # await delete_oga_files()
     # await get_dialodgs()
     id_chennal = event.message.chat_id # достаем idчата или какнал от которо пришло сообщение
     message = event.message # достаем сообщение полное с медиа
@@ -105,7 +106,7 @@ async def client2_channels_handler(event):
 #обработка входящих сообщений телеграм на номер client
 @client.on(events.NewMessage())
 async def client_channels_handler(event):
-    # await delete_oga_files()
+    await delete_oga_files()
     # await main1()
     # print(len(data_dict))
     global text1
