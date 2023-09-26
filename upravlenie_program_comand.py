@@ -69,7 +69,7 @@ async def comand_telegram(event, bot):
     if  len(text) == 4 and str(text).upper() == 'STOP':
         update_value_db(0, 'flag_start_stop_allpokupki')
         if bool(*start_stop_db('flag_start_stop_allpokupki')) == False:
-            await bot.send_message(-1001701470058, '💸❗ Общая закупка запрещена - ❌')
+            await bot.send_message(-1001701470058, '❗Общая закупка запрещена - ❌')
     if  len(text) == 4 and str(text).upper() == 'FLAG':
         if bool(*start_stop_db('flag_start_stop_allpokupki')) == True:
             message_status = '💸❗️ Общая закупка разрешена - ✅\n📗 Публикация новостей - ✅\n🤑 Публикация сигналов - ✅'
